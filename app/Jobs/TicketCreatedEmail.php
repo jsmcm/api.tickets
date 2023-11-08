@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Support\Facades\Log;
 
-class SendEmail implements ShouldQueue
+class TicketCreatedEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -33,7 +33,7 @@ class SendEmail implements ShouldQueue
     public function handle(): void
     {
         //
-        Log::write("debug", "in SendEmail...(".$this->department->host_name.")");
+        //Log::write("debug", "in SendEmail...(".$this->department->host_name.")");
         Mail::to($this->email)->send(new TicketCreated([
             "subject"       => $this->subject,
             "ticketId"      => $this->ticketId,

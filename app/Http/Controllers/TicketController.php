@@ -4,71 +4,182 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Models\Department;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Services\TicketService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Policies\TicketPolicy;
+
+use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
     //
-
-    public function store(
-        int $departmentId,
-        int $userId,
-        string $subject,
-        string $ip,
-        string $priority
-    )
+    public function destroy(Ticket $ticket)
     {
-        
-        if ($departmentId == 0) {
-            throw new Exception("Department Id not set", 1600001);
-        }
-        
-        if ($userId == 0) {
-            throw new Exception("User Id not set", 1600002);
+
+        try {
+            $ticket->delete();
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => $e->getMessage()
+                ], 500);
         }
 
-        if ($priority == "") {
-            $priority = "normal";
-        }
-        
-        $ticket = new Ticket();
-        $ticket->department_id = $departmentId;
-        $ticket->user_id = $userId;
-        $ticket->subject = $subject;
-        $ticket->ip = $ip;
-        $ticket->folder_hash = date("YmdHis")."_".Str::random(10);
-        $ticket->priority = $priority;
-
-        $ticket->save();
-
-        return $ticket->id;
+        return response()->json(
+            [
+                "status"    => "success",
+            ], 200
+        );
 
     }
 
 
 
 
-    public function get(Ticket $ticket)
+        /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Ticket $ticket)
     {
+        //
+        if (isset($request->status)) {
+            $ticket->status = filter_var($request->status, FILTER_UNSAFE_RAW);
+        }
+
+        Log::write("debug", "request: ");
+        Log::write("debug", $request->all());
+        Log::write("debug", "request->status: ");
+        Log::write("debug", $request->status);
+
+        try {
+            $ticket->save();
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => $e->getMessage()
+                ], 500);
+        }
+
+        return response()->json(
+            [
+                "status"    => "success",
+            ], 200
+        );
+
+    }
+
+
+    public function store(Request $request)
+    {
+
+        // Log::debug("TicketController Store... pre validate:");
+        // Log::debug(print_r($request->all(), true));
+
+        $validatedData = $request->validate([
+            "email"         => "required|email",
+            "firstName"     => "required|string",
+            "departmentId"  => "required|integer",
+            "subject"       => "required|string",
+            "priority"      => "required|string"
+        ]);
+
+        // Log::debug("after validation...");
+
+        $ticketService = new TicketService();
+        try {
+            $ticket = $ticketService->store(
+                $validatedData["subject"],
+                $validatedData["departmentId"],
+                $_SERVER["REMOTE_ADDR"],
+                $validatedData["priority"],
+                $validatedData["email"],
+                $validatedData["firstName"]
+            );
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => $e->getMessage()
+                ], 500);
+        }
+
+        return response()->json(
+            [
+                "status"    => "success", 
+                "data"      => $ticket->id
+            ], 200
+        );
+
+    }
+
+
+
+
+
+
+    public function show(Ticket $ticket)
+    {
+        
+        Gate::authorize("view", $ticket);
+    
+        $tickets = null;
+
+        if (auth()->user()->can("viewInternalNotes", $ticket)) {
+            $tickets = $ticket->load(["thread", "department", "user", "thread.attachement"]);
+        } else {
+            $tickets = $ticket->load(["thread" => function ($query) {
+                $query->excludeInternalNotes();
+            }, "user", "department", "thread.attachement"]);
+        }
+
         return response()->json(
             [
                 "status" => "success", 
-                "data" => $ticket->load("thread", "user", "thread.attachement")
+                "data" => $tickets
             ], 200
         );
     }
 
 
+    public function search(Request $request)
+    {
+        $ticketService = new TicketService();
+        
+        return response()->json(
+            [
+                "status"    => "success", 
+                "data"      => $ticketService->search(filter_var($request->search, FILTER_UNSAFE_RAW))
+            ], 200
+        ); 
+    }
+
+
+    public function userSearch(Request $request)
+    {
+        $ticketService = new TicketService();
+       
+        return response()->json(
+            [
+                "status"    => "success", 
+                "data"      => $ticketService->userSearch(filter_var($request->search, FILTER_UNSAFE_RAW))
+            ], 200
+        ); 
+    }
+
+
+
 
     public function index(Request $request)
     {
-        
-        // $user = auth()->user();
 
+        $user = auth()->user();
 
         $priority = ["high","normal","low"];
         if (isset($request->priority)) {
@@ -80,21 +191,25 @@ class TicketController extends Controller
         $tickets = Ticket::whereIn("priority", $priority);
 
 
+        if ($user->level < 10) {
+            // individual user, search tickets where userid
+            $tickets->where(["user_id" => $user->id]);
 
-        // $userId = 0;
-        // if ($user->level < 10) {
-        //     $userId = $user->id;
-        // } else if ($user->level >= 100) {
+        } else if ($user->level >= 10 && $user->level < 20) {
+
+           // department owner, search tickers where departmentid
+           $departmentIds = Department::where(["user_id" => intVal($user->id)])->pluck("id");
+           $tickets->whereIn("department_id", $departmentIds)->get();
+        } else if ($user->level >= 100) {
             
-        //     if (isset($request->user)) {
-        //         $userId = intVal($request->user);
-        //     }
-        // }
+            // admin 
+            if (isset($request->user)) {
+                // searching a specific user
+                $tickets->where(["user_id" => intVal($request->user)]);
+            }
+        }
 
 
-        // if ($userId > 0) {
-        //     $tickets->where(["user_id" => $userId]);
-        // }
 
 
         $status = ["open", "overdue", "answered"];
@@ -120,10 +235,6 @@ class TicketController extends Controller
         ->with("department")
         ->withCount("attachement")
         ->with("thread");
-
-
-
-
 
         return response()->json(
             [

@@ -7,11 +7,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
+
 use Exception;
 
 class Ticket extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, Searchable;
 
 
     public function user()
@@ -34,36 +37,11 @@ class Ticket extends Model
         return $this->hasMany(Attachement::class);
     }
 
-
-    public function merge(Ticket $ticket)
+    public function toSearchableArray()
     {
-
-        if ($ticket->user_id != $this->user_id) {
-            throw new Exception("Merge ticket does not belong to merging ticket user");
-        }
-
-        if ($this->deleted == true) {
-            throw new Exception("Merging ticket deleted (possibly already merged)");
-        }
-
-
-        $ticket->subject = $ticket->subject." (".$this->subject.")";
-        $this->deleted = true;
-        $this->subject = $this->subject." (merged with ".$ticket->id.")";
-
-        $this->save();
-        $ticket->save();
-
-        $threads = $this->thread;
-
-        foreach ($threads as $thread) {
-            $thread->ticket_id = $ticket->id;
-            $thread->save();
-        }
-
-        return true;
-
+        return [
+            "subject"   => $this->subject
+        ];
     }
-
 
 }

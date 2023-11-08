@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\TicketController;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
+use App\Services\TicketService;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,111 +30,67 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-Route::post("/ticket/thread/{ticket}", "App\Http\Controllers\ThreadController@post");
 
 
-/**
- * Merge a ticket
- */
-Route::get("/ticket/merge/{ticket}", function(Ticket $ticket, Request $request) {
+Route::group([
 
+    'middleware' => 'api',
+
+], function ($router) {
+
+    Route::get("/tickets/search", "App\Http\Controllers\TicketController@search");
+    Route::get("/tickets/user-search", "App\Http\Controllers\TicketController@userSearch");
+
+    Route::get("/tickets", "App\Http\Controllers\TicketController@index");
+    Route::post("/tickets", "App\Http\Controllers\TicketController@store");
+    Route::patch("/tickets/{ticket}", "App\Http\Controllers\TicketController@update");
+    Route::get("/tickets/{ticket}", "App\Http\Controllers\TicketController@show");
+    Route::delete("/tickets/{ticket}", "App\Http\Controllers\TicketController@destroy");
+
+    Route::post("/attachment", "App\Http\Controllers\AttachementController@store");
+
+    Route::post("/thread/{ticket}", "App\Http\Controllers\ThreadController@store");
     
-    $mergeWith = Ticket::find($request->ticket_id);
+    
+    Route::get("/canned-replies", "App\Http\Controllers\CannedReplyController@index");
+    Route::post("/canned-replies", "App\Http\Controllers\CannedReplyController@store");
+    Route::delete("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@destroy");
+    Route::patch("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@update");
+    Route::get("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@show");
 
-    if ($mergeWith == null) {
-        return response()->json(["status" => "failed", "data" => "Merge ticket does not exist"], 500);
-    }
-
-    try {
-        if ($ticket->merge($mergeWith)) {
-            return response()->json(["status" => "success", "data" => "ticket merged"], 200);
+    /**
+     * Merge a ticket
+     */
+    Route::patch("/tickets/merge/{ticket}", function(Ticket $ticket, Request $request) {
+    
+        
+        // 
+        Log::write("debug", "merge: ".$ticket->id." with ".$request->ticket_id);
+        $mergeWith = Ticket::find($request->ticket_id);
+    
+        if ($mergeWith == null) {
+            return response()->json(["status" => "failed", "data" => "Merge ticket does not exist"], 500);
         }
-    } catch (Exception $e) {
-        return response()->json(["status" => "failed", "data" => $e->getMessage()], 401);
-    }
-
     
-});
-
-
-
-
-/**
- * Create a new ticket
- */
-Route::post("/ticket", function(Request $request) {
-
-    $email = "";
-    if (isset($request->email)) {
-        $email = filter_var($request->email, FILTER_SANITIZE_EMAIL);
-    }
-
-    $user = User::where(["email" => $email])->first();
-    if ($user == null) {
-        $firstName = "";
-        if (isset($request->firstName)) {
-            $firstName = filter_var($request->firstName, FILTER_UNSAFE_RAW);
+        try {
+    
+            $ticketService = new TicketService();
+            
+            if ($ticketService->merge($mergeWith, $ticket)) {
+                return response()->json(["status" => "success", "data" => "ticket merged"], 200);
+            }
+    
+        } catch (Exception $e) {
+            return response()->json(["status" => "failed", "data" => $e->getMessage()], 401);
         }
-
-
-        $user = new User();
-        $user->level = 1;
-        $user->name = $firstName;
-        $user->email = $email;
-        $user->password = Hash::make(date("Y-m-d H:i:s").mt_rand(10000, 99999).mt_rand(10000, 99999));
-        $user->save();
-    }
-
-    $departmentId = 0;
-    if (isset($request->departmentId)) {
-        $departmentId = intVal($request->departmentId);
-    }
-
-
-    $subject = "";
-    if (isset($request->subject)) {
-        $subject = filter_var($request->subject, FILTER_UNSAFE_RAW);
-    }
-
     
-    $priority = "";
-    if (isset($request->priority)) {
-        $priority = filter_var($request->priority, FILTER_UNSAFE_RAW);
-    }
-
+        
+    });
     
-    $ticket = new \App\Http\Controllers\TicketController();
-    try {
-        $ticketId = $ticket->store($departmentId, $user->id, $subject, $_SERVER["REMOTE_ADDR"], $priority);
-    } catch (Exception $e) {
-        return response()->json(["status" => "failed", "data" => "ticket creation failed"], 500);
-    }
 
-    $type = "from-client";
-
-    $message = "";
-    if (isset($request->message)) {
-        $message = filter_var($request->message, FILTER_UNSAFE_RAW);
-    }
-
-    $thread = new \App\Http\Controllers\ThreadController();
-    try {
-        $threadId = $thread->store($ticketId, $type, $message);
-    } catch (Exception $e) {
-        return response()->json(["status" => "failed", "data" => "ticket thread creation failed"], 500);
-    }
-
-    if ($threadId) {
-        return response()->json(["status" => "success", "ticket_id" => $ticketId], 200);
-    }
+    Route::get("/departments", "App\Http\Controllers\DepartmentController@index");
 
 });
-
-
-
-Route::get("/ticket/{ticket}", "App\Http\Controllers\TicketController@get");
-Route::get("/tickets", "App\Http\Controllers\TicketController@index");
-
 
 Route::group([
 
@@ -140,13 +99,9 @@ Route::group([
 
 ], function ($router) {
 
-    Route::post('login', 'AuthController@login');
-    Route::post('logout', 'AuthController@logout');
-    Route::post('refresh', 'AuthController@refresh');
-    Route::post('me', 'AuthController@me');
-
-    
+    Route::post('login', 'App\Http\Controllers\AuthController@login');
+    Route::post('logout', 'App\Http\Controllers\AuthController@logout');
+    Route::post('refresh', 'App\Http\Controllers\AuthController@refresh');
+    Route::post('me', 'App\Http\Controllers\AuthController@me');
 
 });
-
-

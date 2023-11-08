@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Ticket Created</title>
+        <title>Different Email Address</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -29,18 +29,19 @@
                         <div>
                         
 
-                            <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Ticket Created</h2>
+                            <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Incorrect Email Address</h2>
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Hello,
                             </p>
+                            
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                We've received your email request with subject <strong>"{{ $subject }}"</strong> and will attend to it as soon as possible.
+                                We've received your email request with subject <strong>"{{ $subject }}"</strong>. However this ticket was sent from a different email address.
                             </p>
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                If you reply to this email please do keep the subject line in tact.
+                                We are unable to attend to email follow ups from different email address. Please use your original email address or send a new email.
                             </p>
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Thank you, 
@@ -48,7 +49,6 @@
                             
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 {!! str_replace("\r\n", "<br />", $signature) !!}
-                                <br />Ticket: {{ $ticketId }}
                             </p>
 
                         </div>

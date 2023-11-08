@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId("user_id");
             $table->string("department")->nullable(false);
+            $table->text("logo_url");
             $table->text("signature");
             $table->string("mail_host");
             $table->integer("pop_port")->default(110);
@@ -22,14 +23,18 @@ return new class extends Migration
             $table->string("mail_username");
             $table->string("mail_password");
             $table->string("email_address");
-            $table->boolean("deleted")->default(false);
             $table->timestamps();
         });
 
         Schema::table('departments', function (Blueprint $table) {
-            // Add a unique constraint on 'department_name' and 'user_id' columns
+            // Add a unique constraint on 'department_name' and 'company_id' columns
             $table->unique(['department', 'user_id']);
         });
+
+        Schema::table('departments', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+        
         
     }
 

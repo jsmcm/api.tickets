@@ -28,16 +28,20 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                         <div>
                         
-
-                            <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Ticket Created</h2>
+                            <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">New Reply</h2>
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Hello,
                             </p>
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                We've received your email request with subject <strong>"{{ $subject }}"</strong> and will attend to it as soon as possible.
+                                We've added a reply to your email request with subject <strong>"{{ $subject }}"</strong>.
                             </p>
+
+
+                            <div style="border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey; padding: 25px;">
+                                {!! $messaged !!}
+                            </div>
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 If you reply to this email please do keep the subject line in tact.

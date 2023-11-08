@@ -10,11 +10,14 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.8",
         "laravel/sanctum": "^3.2",
+        "laravel/scout": "^10.4",
         "laravel/tinker": "^2.8",
+        "league/flysystem-aws-s3-v3": "^3.15",
         "php-imap/php-imap": "^5.0",
         "predis/predis": "^2.1",
         "swiftmailer/swiftmailer": "^5.4",
-        "tymon/jwt-auth": "^2.0"
+        "tymon/jwt-auth": "^2.0",
+        "willdurand/email-reply-parser": "^2.10"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

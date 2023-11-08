@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 
-class TicketCreated extends Mailable
+class DifferentEmailAddress extends Mailable
 {
     use SerializesModels;
 
@@ -60,7 +60,7 @@ class TicketCreated extends Mailable
         // Log::write("debug", "from: ".$this->config["department"]->email_address);
 
         return new Envelope(
-            subject: "[#".str_pad(dechex($this->config["ticketId"]), 5, "0", STR_PAD_LEFT)."] Ticket Created",
+            subject: "Incorrect Email Address",
             from: $this->config["department"]->email_address
         );
     }
@@ -71,10 +71,9 @@ class TicketCreated extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.ticket.created',
-            text: 'emails.ticket.created-text',
+            view: 'emails.ticket.different-email',
+            text: 'emails.ticket.different-email-text',
             with: [
-                "ticketId"      => "#".str_pad(dechex($this->config["ticketId"]), 5, "0", STR_PAD_LEFT),
                 "department"    => $this->config["department"]->department,
                 "subject"       => $this->config["subject"],
                 "signature"     => $this->config["department"]->signature,

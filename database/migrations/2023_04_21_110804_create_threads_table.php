@@ -17,10 +17,14 @@ return new class extends Migration
             $table->foreignId("ticket_id");
             $table->dateTime("date")->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->enum("type", ["from-client", "internal-note", "to-client", "to-client-ml"]);
-            $table->longText("message");
-            $table->boolean("deleted")->default(false);
+            $table->longText("message")->fulltext();
             $table->timestamps();
         });
+
+        Schema::table('threads', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+        
     }
 
     /**

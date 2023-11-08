@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
+
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+
+use Illuminate\Support\Facades\Log;
+
 
 class AuthController extends Controller
 {
@@ -26,14 +31,54 @@ class AuthController extends Controller
      */
     public function login()
     {
+        Log::write("debug", "doing login");
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        Log::write("debug", "credentials: ".print_r($credentials, true));
+
+        // if (! $token = auth()->attempt($credentials)) {
+        //     Log::debug("auth failed at 1...");
+        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // }
+
+	    if (! $token = auth()->attempt($credentials)) {
+            
+            Log::debug("auth failed at 2...");
+
+            if (User::where(["email" => Request()->email])->count() == 0) {
+                Log::write("debug", "user is empty");
+                return response()->json(['error' => 'No such user'], 404);
+            }
+
+            Log::write("debug", "Unauthorized");
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        if(auth()->user()->deleted_at != null) {
+            Log::write("debug", "No such user");
+            return response()->json(['error' => 'No such user'], 404);
+        }
+
+        Log::debug("authed, calling respondWithToken: ".$token);
         return $this->respondWithToken($token);
     }
+
+    public function getMe()
+    {
+        Log::debug("in getMe");
+        Log::debug("return: ".print_r(auth()->user(), true));
+        
+        return [
+            "level" => auth()->user()->level,
+            "email" => auth()->user()->email,
+            "id"    => auth()->user()->id,
+            "name"  => auth()->user()->name,
+        ];
+
+    }
+
+
+
 
     /**
      * Get the authenticated User.
@@ -42,6 +87,12 @@ class AuthController extends Controller
      */
     public function me()
     {
+        // Log::debug("in me");
+        // Log::debug("return: ".print_r(auth()->user(), true));
+
+        // Log::debug("headers...");
+        // Log::debug( print_r(Request()->headers->all(), true) );
+        
         return response()->json(auth()->user());
     }
 
@@ -52,6 +103,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
+        Log::debug("auth:".print_r(auth()->user(), true));
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
@@ -76,10 +128,12 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+        Log::debug("in respondWithToken: ".$token);
+        
+        return response()->json(array_merge([
+            'access_token'  => $token,
+            'token_type'    => 'bearer',
+            'expires_in'    => auth()->factory()->getTTL() * 60
+        ], $this->getMe()));
     }
 }

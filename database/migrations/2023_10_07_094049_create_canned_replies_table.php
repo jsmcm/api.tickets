@@ -11,22 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+
+        Schema::create('canned_replies', function (Blueprint $table) {
             $table->id();
-            $table->integer("level")->default(1);
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->foreignId("department_id");
+            $table->text("message")->nullable(false);
+            $table->string("slug");
+            $table->string("title");
+            $table->boolean("use_ml");
             $table->timestamps();
         });
 
 
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('canned_replies', function (Blueprint $table) {
             $table->softDeletes();
         });
-
 
     }
 
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('canned_replies');
     }
 };

@@ -3,9 +3,11 @@ use App\Models\User;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
-use App\Jobs\SendEmail;
+use App\Jobs\TicketCreatedEmail;
+use App\Mail\TicketCreated;
 use App\Models\Department;
 use Illuminate\Support\Facades\Log;
+use App\Services\MailDownloader\Download;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +19,16 @@ use Illuminate\Support\Facades\Log;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get("/download", function () {
+   
+    $download = new Download("john@fluffykids.co.za", "M4thewMc05", App\Jobs\MakeTicketFromEmail::class, "mail.fluffykids.co.za", 143,"imap");
+
+    $download->download();
+    
+
+});
+
 
 Route::get('/', function () {
     return "<a href='https://softsmart.co.za'>SoftSmart.co.za</a>";
@@ -45,9 +57,9 @@ Route::get("/smtp", function() {
         if ($department->mail_host === "mail.softsmart.co.za") {
             continue;
         }
-        print "<p>Department: ".print_r($department, true)."</p>";
+        print "<p>Department: ".print_r($department->mail_host, true)."</p>";
         Log::write("debug", "in web.php, ".$department->mail_host);
-        SendEmail::dispatch($department, "john@softsmart.co.za", "This is a subject", 12344);
+        TicketCreatedEmail::dispatch($department, "john@softsmart.co.za", "This is a subject", 12344);
 
     }
 

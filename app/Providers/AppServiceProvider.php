@@ -22,17 +22,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-
-        Mail::extend("softsmartmailer", function () {
-
-            $config = [
-                "end_point" => config("mail.mailers.softsmartmailer.end_point"),
-                "mail_name" => config("mail.mailers.softsmartmailer.mail_name"),
-                "mailer"    => config("mail.mailers.softsmartmailer.mailer"),
-                "api_key"   => config("mail.mailers.softsmartmailer.api_key"),
-            ];
-            return new MailerTransport($config);
-        });
-
     }
 }

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'softsmartmailer'),
+    'default' => env('MAIL_MAILER', 'smtp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,14 +47,6 @@ return [
 
         'ses' => [
             'transport' => 'ses',
-        ],
-
-        'softsmartmailer' => [
-            "transport" => "softsmartmailer",
-            "end_point" => env('SOFTSMART_MAILER_END_POINT', 'https://mailer.softsmart.co.za/api/transactional-mails/send'),
-            "mail_name" => env('SOFTSMART_MAILER_MAIL_NAME', 'support_mail'),
-            "mailer"    => env('SOFTSMART_MAILER_MAILER', 'aws_ses'),
-            "api_key"   => env('SOFTSMART_MAILER_API_KEY', ''),
         ],
 
         'mailgun' => [
