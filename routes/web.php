@@ -8,6 +8,8 @@ use App\Mail\TicketCreated;
 use App\Models\Department;
 use Illuminate\Support\Facades\Log;
 use App\Services\MailDownloader\Download;
+use Illuminate\Support\Facades\Cache;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -20,11 +22,28 @@ use App\Services\MailDownloader\Download;
 |
 */
 
+Route::get("/users", function () { 
+	print "<p>getting users...</p>";
+
+    //$users = cache()->remember("aaa", now()->addSeconds(30), function () {
+        $users = User::all();
+    //});
+
+	
+	print_r($users);
+});
+
+Route::get("/env", function() {
+	print "<p>db: ".env("DB_DATABASE")."</p>";
+	print "<p>db: ".env("DB_HOST")."</p>";
+});
+
+
 Route::get("/download", function () {
    
-    $download = new Download("john@fluffykids.co.za", "M4thewMc05", App\Jobs\MakeTicketFromEmail::class, "mail.fluffykids.co.za", 143,"imap");
+    //$download = new Download("john@fluffykids.co.za", "M4thewMc05", App\Jobs\MakeTicketFromEmail::class, "mail.fluffykids.co.za", 143,"imap");
 
-    $download->download();
+    //$download->download();
     
 
 });
@@ -36,7 +55,7 @@ Route::get('/', function () {
 
 
 Route::get("/smtp", function() {
-
+return;
     // MAIL_MAILER=smtp
     // MAIL_HOST=mail.softsmart.co.za
     // MAIL_PORT=587
@@ -73,6 +92,7 @@ Route::get("/smtp", function() {
 
 Route::get("/id", function () {
 
+	return;
 
     $mail_boxes = config("support.mail_boxes");
     print "mail_boxes: ".print_r($mail_boxes, true);
@@ -101,6 +121,7 @@ Route::get("/id", function () {
 
 Route::get("/mail", function () {
 
+	return;
 
     $departments = \App\Models\Department::orderBy("id", "desc")
     ->where(["deleted"=>false])

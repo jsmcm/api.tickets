@@ -12,11 +12,14 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Services\MailDownloader\Download;
 
-use Illuminate\Support\Facades\Log;
+//use Illuminate\Support\Facades\Log;
 
-class DownloadDepartmentEmails implements ShouldQueue
+class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    
+    public $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
@@ -26,22 +29,21 @@ class DownloadDepartmentEmails implements ShouldQueue
         //
     }
 
+    public function uniqueId()
+    {
+        return $this->department->id;
+    }
+
+
     /**
      * Execute the job.
      */
     public function handle(): void
     {
         //
-        Log::debug("downloading emails for dept: ".$this->department->department);
-        Log::debug("id: ".$this->department->id);
-        Log::debug("user_id: ".$this->department->user_id);
-        Log::debug("signature: ".$this->department->signature);
-        Log::debug("mail_host: ".$this->department->mail_host);
-        Log::debug("pop_port: ".$this->department->pop_port);
-        Log::debug("smtp_port: ".$this->department->smtp_port);
-        Log::debug("mail_username: ".$this->department->mail_username);
-        Log::debug("mail_password: ".$this->department->mail_password);
-        Log::debug("email_address: ".$this->department->email_address);
+
+
+        //Log::debug("downloading emails for dept: ".$this->department->department);
 
         $download = new Download(
             $this->department->mail_username,
