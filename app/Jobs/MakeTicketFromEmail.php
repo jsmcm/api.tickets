@@ -132,14 +132,14 @@ class MakeTicketFromEmail implements ShouldQueue
                 $path = "attachements/temp/".$randomString."_".$attachment->id."_".$attachment->name;
 
                 // Log::debug("move: ".$attachment->path." to ".$path);
-               Storage::disk("s3")->put(
+               Storage::disk("s3_file_storage")->put(
                     $path,
                     file_get_contents($attachment->path),
                     "public"
                 );
 
                 $attachmentModel = new Attachement();
-                $attachmentModel->ticket_id = $ticketId;
+                $attachmentModel->ticket_id = $ticket->id;
                 $attachmentModel->thread_id = $thread->id;
                 $attachmentModel->random_string = $randomString;
                 $attachmentModel->uuid = $attachment->id;

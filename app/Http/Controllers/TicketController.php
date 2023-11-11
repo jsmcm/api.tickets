@@ -52,10 +52,6 @@ class TicketController extends Controller
             $ticket->status = filter_var($request->status, FILTER_UNSAFE_RAW);
         }
 
-        Log::write("debug", "request: ");
-        Log::write("debug", $request->all());
-        Log::write("debug", "request->status: ");
-        Log::write("debug", $request->status);
 
         try {
             $ticket->save();
@@ -79,8 +75,6 @@ class TicketController extends Controller
     public function store(Request $request)
     {
 
-        // Log::debug("TicketController Store... pre validate:");
-        // Log::debug(print_r($request->all(), true));
 
         $validatedData = $request->validate([
             "email"         => "required|email",
@@ -90,7 +84,6 @@ class TicketController extends Controller
             "priority"      => "required|string"
         ]);
 
-        // Log::debug("after validation...");
 
         $ticketService = new TicketService();
         try {
@@ -180,6 +173,15 @@ class TicketController extends Controller
     {
 
         $user = auth()->user();
+
+	if ($user == null) {
+        	return response()->json([
+                	"status" => "error",
+                	"data" => "Not authorized, please log in..."
+            	]
+        	, 401);
+	}
+
 
         $priority = ["high","normal","low"];
         if (isset($request->priority)) {

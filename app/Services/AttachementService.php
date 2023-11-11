@@ -18,7 +18,10 @@ class AttachementService
 
         $fileName = $uploadedFile->getClientOriginalName();
             
-        $path = $uploadedFile->storePubliclyAs("attachements/temp/".$dropzoneId, $uuid."_".$fileName);
+        $path = $uploadedFile->storePubliclyAs(
+            "attachements/temp/".$dropzoneId, $uuid."_".$fileName,
+            "s3_file_storage"
+        );
         
         
         $attachment = new Attachement();

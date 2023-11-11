@@ -22,8 +22,26 @@ use Illuminate\Support\Facades\Cache;
 |
 */
 
+Route::get("/uname", function () {
+return `uname -a`;
+});
+
+Route::get("/mbstring", function () {
+    return extension_loaded("mbstring") ? "ok" : "ko";
+});
+
+Route::get("/imap", function () {
+    return extension_loaded("imap") ? "ok" : "ko";
+});
+
+Route::get("/php", function () {
+    phpinfo();
+});
+
 Route::get("/users", function () { 
-	print "<p>getting users...</p>";
+
+    return;
+	print "<p>getting users no cache...</p>";
 
     //$users = cache()->remember("aaa", now()->addSeconds(30), function () {
         $users = User::all();

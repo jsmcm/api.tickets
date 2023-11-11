@@ -57,6 +57,19 @@ return [
             'visibility' => 'public',
         ],
 
+        's3_file_storage' => [
+            'driver' => 's3',
+            'key' => env('AWS_FILE_STORAGE_ACCESS_KEY_ID'),
+            'secret' => env('AWS_FILE_STORAGE_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_FILE_STORAGE_DEFAULT_REGION'),
+            'bucket' => env('AWS_FILE_STORAGE_BUCKET'),
+            'url' => env('AWS_FILE_STORAGE_URL'),
+            'endpoint' => env('AWS_FILE_STORAGE_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_FILE_STORAGE_USE_PATH_STYLE_ENDPOINT', false),
+            //'throw' => false,
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*
