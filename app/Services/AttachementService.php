@@ -27,7 +27,7 @@ class AttachementService
         $attachment = new Attachement();
         $attachment->random_string = $dropzoneId;
         $attachment->uuid = $uuid;
-        $attachment->file_url = "https://".config("filesystems.disks.s3.bucket").".s3.".config("filesystems.disks.s3.region").".amazonaws.com/".$path;
+        $attachment->file_url = "https://".config("filesystems.disks.s3_file_storage.bucket").".s3.".config("filesystems.disks.s3_file_storage.region").".amazonaws.com/".$path;
         
         $attachment->save();
         

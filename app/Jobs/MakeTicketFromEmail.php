@@ -143,7 +143,7 @@ class MakeTicketFromEmail implements ShouldQueue
                 $attachmentModel->thread_id = $thread->id;
                 $attachmentModel->random_string = $randomString;
                 $attachmentModel->uuid = $attachment->id;
-                $attachmentModel->file_url = "https://".config("filesystems.disks.s3.bucket").".s3.".config("filesystems.disks.s3.region").".amazonaws.com/".$path;
+                $attachmentModel->file_url = "https://".config("filesystems.disks.s3_file_storage.bucket").".s3.".config("filesystems.disks.s3_file_storage.region").".amazonaws.com/".$path;
                 
                 $attachmentModel->save();
             }
