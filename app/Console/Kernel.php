@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new DownloadEmails)
         ->everyMinute()
         ->onOneServer();
-;
+
         //$schedule->job(new DownloadEmails)->everyFiveMinutes();
         //$schedule->job(new DownloadEmails)->everyFifteenMinutes();
     }

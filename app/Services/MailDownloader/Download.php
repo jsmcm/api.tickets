@@ -11,6 +11,9 @@ use PhpImap\Mailbox;
 
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 class Download
 {
 
@@ -187,19 +190,32 @@ class Download
                     
                     $attachmentObject = new \stdClass();
 
-                    $attachment->setFilePath("/tmp/".(string) $attachment->id);
+                    //$path = storage_path("/app/".(string) $attachment->id);
+                    //$attachment->setFilePath($path);
 
-                    if ($attachment->saveToDisk()) {
+                    $randomString = date("Ydm_His")."_".Str::random(48);
+                    $path = "attachements/temp/".$randomString."_".$attachment->id."_".$attachment->name;
+    
+                    // Log::debug("move: ".$attachment->path." to ".$path);
+                    Storage::disk("s3_file_storage")->put(
+                        $path,
+                        $attachment->getContents(),
+                        "public"
+                    );
+
+
+                    //if ($attachment->saveToDisk()) {
                         //Log::debug("attachment saved as /tmp/".(string) $attachment->id);
-                        $attachmentObject->id = (string) $attachment->id;
-                        $attachmentObject->path = "/tmp/".$attachment->id;
-                        $attachmentObject->name = $attachment->name;
-                        $attachmentObject->sizeInBytes = $attachment->sizeInBytes;
-                        $attachmentObject->mime = $attachment->mime;
-                        $attachmentObject->fileExtension = $attachment->fileExtension;
+                        $attachmentObject->id               = (string) $attachment->id;
+                        $attachmentObject->path             = $path;
+                        $attachmentObject->randomString     = $randomString;
+                        $attachmentObject->name             = $attachment->name;
+                        $attachmentObject->sizeInBytes      = $attachment->sizeInBytes;
+                        $attachmentObject->mime             = $attachment->mime;
+                        $attachmentObject->fileExtension    = $attachment->fileExtension;
 
-                        $attachmentsArray[] = $attachmentObject;
-                    }
+                        $attachmentsArray[]                 = $attachmentObject;
+                    //}
 
                 }
 
@@ -239,8 +255,10 @@ class Download
         }
 
 
+        $numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
+                // Log::debug("fetchEmail: ".$mail_id);
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
                     
                     // Log::debug("DT: ".$mail->headers()["Delivered-To"]);
@@ -257,9 +275,15 @@ class Download
 
                     // Ignore bounces
                     if ($mail->headers()["Return-Path"] != "<>") {
-                        $this->callbackJob::dispatch($mail);   
+                        $this->callbackJob::dispatch($mail)
+                            ->delay(now()
+                            ->addSeconds(15));
                     }
                     $this->mailbox->deleteMail($mail_id);
+
+                    if ($numberToGet++ >= 5) {
+                        break;
+                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ class DownloadEmails implements ShouldQueue
         $departments = Department::all();
         $departments->makeVisible("mail_password");
 
-        //Log::debug("dispatching download department emails");
+        Log::debug("dispatching download department emails");
 
         foreach ($departments as $department) {
             DownloadDepartmentEmails::dispatch($department);

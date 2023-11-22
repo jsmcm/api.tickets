@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Services\MailDownloader\Download;
 
-//use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
 class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
 {
@@ -43,7 +43,7 @@ class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
         //
 
 
-        //Log::debug("downloading emails for dept: ".$this->department->department);
+        Log::debug("downloading emails for dept: ".$this->department->department);
 
         $download = new Download(
             $this->department->mail_username,

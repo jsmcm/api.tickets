@@ -128,22 +128,22 @@ class MakeTicketFromEmail implements ShouldQueue
 
                 // Log::debug("attachment: ".print_r($attachment, true));
 
-                $randomString = date("Ydm_His")."_".Str::random(48);
-                $path = "attachements/temp/".$randomString."_".$attachment->id."_".$attachment->name;
+            //     $randomString = date("Ydm_His")."_".Str::random(48);
+            //     $path = "attachements/temp/".$randomString."_".$attachment->id."_".$attachment->name;
 
-                // Log::debug("move: ".$attachment->path." to ".$path);
-               Storage::disk("s3_file_storage")->put(
-                    $path,
-                    file_get_contents($attachment->path),
-                    "public"
-                );
+            //     // Log::debug("move: ".$attachment->path." to ".$path);
+            //    Storage::disk("s3_file_storage")->put(
+            //         $path,
+            //         $attachment->data,
+            //         "public"
+            //     );
 
-                $attachmentModel = new Attachement();
-                $attachmentModel->ticket_id = $ticket->id;
-                $attachmentModel->thread_id = $thread->id;
-                $attachmentModel->random_string = $randomString;
-                $attachmentModel->uuid = $attachment->id;
-                $attachmentModel->file_url = "https://".config("filesystems.disks.s3_file_storage.bucket").".s3.".config("filesystems.disks.s3_file_storage.region").".amazonaws.com/".$path;
+                $attachmentModel                = new Attachement();
+                $attachmentModel->ticket_id     = $ticket->id;
+                $attachmentModel->thread_id     = $thread->id;
+                $attachmentModel->random_string = $attachment->randomString;
+                $attachmentModel->uuid          = $attachment->id;
+                $attachmentModel->file_url      = "https://".config("filesystems.disks.s3_file_storage.bucket").".s3.".config("filesystems.disks.s3_file_storage.region").".amazonaws.com/".$attachment->path;
                 
                 $attachmentModel->save();
             }
