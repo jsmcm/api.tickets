@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string("mail_username");
             $table->string("mail_password");
             $table->string("email_address");
+            $table->string("api_token");
+            $table->string("api_base_url");
             $table->timestamps();
         });
 
