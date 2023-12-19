@@ -28,9 +28,26 @@ class Download
         private string $protocol="imap"
         )
     {
-        $port=993;
+
+
+        set_time_limit(300);
+        imap_timeout(IMAP_OPENTIMEOUT, 300); // Set open timeout to 300 seconds
+        imap_timeout(IMAP_READTIMEOUT, 300); // Set read timeout to 300 seconds
+
+
+        $connectionType = "notls";
+        if ($port == 993) {
+            $connectionType = "ssl";
+        }
+        
+
+        // Log::debug("protocol: ".$protocol);
+        // Log::debug("port: ".$port);
+        // Log::debug("connectionType: ".$connectionType);
+
+
         $this->mailbox = new Mailbox(
-            '{'.$host.':'.$port.'/'.$protocol.'/ssl}INBOX', // IMAP server and mailbox folder
+            '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
             $password // Password for the before configured username
         );
@@ -88,7 +105,7 @@ class Download
         // this is the mail object we'll return
         $mail = new Mail();
 
-        Log::debug("in fetchEmail, gettingMail");
+        // Log::debug("in fetchEmail, gettingMail");
 
         $email = $mailbox->getMail(
             $mail_id, // ID of the email, you want to get
@@ -96,7 +113,7 @@ class Download
         );
 
 
-        Log::debug("got it");
+        // Log::debug("got it");
 
         $header = $mailbox->getMailHeader($mail_id)->headersRaw;
 
@@ -169,12 +186,12 @@ class Download
 
         $message = "";
 
-        Log::debug("loading fragments");
+        // Log::debug("loading fragments");
         foreach($fragments as $fragment) {
             $message .= $fragment->getContent();
         }
 
-        Log::debug("got fragments");
+        // Log::debug("got fragments");
         $mail->message($message);
         
 
@@ -262,18 +279,18 @@ class Download
         }
 
 
-        Log::debug("got mail ids");
+        // Log::debug("got mail ids");
 
         $numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
+                
                 // Log::debug("fetchEmail: ".$mail_id);
-
-                Log::debug("fetchEmail: ".$mail_id);
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
                     
 
-                    Log::debug("got mail");
+                    // Log::debug("got mail");
+                    // Log::debug("DT: ".print_r($mail->headers(), true));
                     // Log::debug("DT: ".$mail->headers()["Delivered-To"]);
 
                     // Log::debug("to: ".$mail->headers()["To"]);
@@ -282,21 +299,27 @@ class Download
 
                     // Log::debug("subject: ".$mail->headers()["Subject"]);
 
-                    // Log::debug("returnpayh: ".$mail->headers()["Return-Path"]);
+                    $returnPath = "";
+                    if (isset($mail->headers()["Return-Path"])) {
+                        $returnPath = $mail->headers()["Return-Path"];
+                    } else if (isset($mail->headers()["Return-path"])) {
+                        $returnPath = $mail->headers()["Return-path"];
+                    }
+                    // Log::debug("returnPath: ".$returnPath);
 
                     //Log::debug(print_r($mail, true));
 
                     // Ignore bounces
-                    if ($mail->headers()["Return-Path"] != "<>") {
+                    if ($returnPath != "<>") {
                         $this->callbackJob::dispatch($mail)
                             ->delay(now()
                             ->addSeconds(15));
                     }
                     $this->mailbox->deleteMail($mail_id);
 
-                    Log::debug("deleted mail");
+                    // Log::debug("deleted mail");
 
-                    if ($numberToGet++ >= 5) {
+                    if ($numberToGet++ >= 25) {
                         break;
                     }
                 }
@@ -308,7 +331,7 @@ class Download
     public function download()
     {
 
-        Log::debug("calling fetch...");
+        // Log::debug("calling fetch...");
         $this->fetch();
 
         $this->mailbox->expungeDeletedMails();
