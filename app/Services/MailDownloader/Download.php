@@ -88,12 +88,15 @@ class Download
         // this is the mail object we'll return
         $mail = new Mail();
 
+        Log::debug("in fetchEmail, gettingMail");
+
         $email = $mailbox->getMail(
             $mail_id, // ID of the email, you want to get
             true //false // Do NOT mark emails as seen (optional)
         );
 
 
+        Log::debug("got it");
 
         $header = $mailbox->getMailHeader($mail_id)->headersRaw;
 
@@ -165,9 +168,13 @@ class Download
         
 
         $message = "";
+
+        Log::debug("loading fragments");
         foreach($fragments as $fragment) {
             $message .= $fragment->getContent();
         }
+
+        Log::debug("got fragments");
         $mail->message($message);
         
 
@@ -255,12 +262,18 @@ class Download
         }
 
 
+        Log::debug("got mail ids");
+
         $numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
                 // Log::debug("fetchEmail: ".$mail_id);
+
+                Log::debug("fetchEmail: ".$mail_id);
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
                     
+
+                    Log::debug("got mail");
                     // Log::debug("DT: ".$mail->headers()["Delivered-To"]);
 
                     // Log::debug("to: ".$mail->headers()["To"]);
@@ -281,6 +294,8 @@ class Download
                     }
                     $this->mailbox->deleteMail($mail_id);
 
+                    Log::debug("deleted mail");
+
                     if ($numberToGet++ >= 5) {
                         break;
                     }
@@ -293,6 +308,7 @@ class Download
     public function download()
     {
 
+        Log::debug("calling fetch...");
         $this->fetch();
 
         $this->mailbox->expungeDeletedMails();
