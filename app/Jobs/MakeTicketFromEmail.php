@@ -48,16 +48,18 @@ class MakeTicketFromEmail implements ShouldQueue
             $sentTo = $this->mail->headers()["Delivered-To"];
         }
 
+	Log::debug("sentTo: ".$sentTo);
+	Log::debug("fromAddress: ".$this->mail->fromAddress());
         $department = Department::where(["email_address" => $sentTo])->first();
-
+	Log::debug("Dept: ".print_r($department, true));
 
         $ticket = null;
 
         $isNewTicket = true;
-        // Log::debug("Subject is: " . $this->mail->subject());
+        Log::debug("Subject is: " . $this->mail->subject());
 
         if(preg_match ("/[[][#][a-fA-F0-9]{5,15}[]]/",$this->mail->subject(), $regs)) {
-            // Log::debug("regs are: ".print_r($regs, true));
+            Log::debug("regs are: ".print_r($regs, true));
             
             // [#00035]
             $ticketId = hexdec(str_replace([
@@ -71,12 +73,12 @@ class MakeTicketFromEmail implements ShouldQueue
 
             $ticket = Ticket::find($ticketId);
 
-            // Log::debug("email is from: ".$this->mail->fromAddress());
+            Log::debug("email is from: ".$this->mail->fromAddress());
 
-            // Log::debug("ticket email : ".$ticket->user->email);
+            Log::debug("ticket email : ".$ticket->user->email);
 
             if ($this->mail->fromAddress() != $ticket->user->email) {
-                //Log::debug("ticket does not belong to this email....");
+                Log::debug("ticket does not belong to this email....");
                 DifferentEmailAddressEmail::dispatch($ticket->department, $this->mail->fromAddress(), $this->mail->subject(), $ticket->id);
                 return;
                 //throw new \Exception("Email received for ticket from different email address. Expected from: ".$ticket->user->email." but received from: ".$this->mail->fromAddress());
