@@ -195,16 +195,22 @@ class Download
         $mail->message($message);
         
 
-        
-        if ($message == "" && $mail->subject() == "") {
-            return null;
-        }
-
         //Log::debug("checking for attachments");
         if (!$mailbox->getAttachmentsIgnore()) {  
 
             //Log::debug("really checking for attachments");
             if ($email->hasAttachments()) {
+
+                // we set blank message and subjects here because if they
+                // are blank but there is an attachment we do want that ticket
+                if ($message == "") {
+                    $mail->message("[BLANK BODY]");
+                }
+
+                if ($mail->subject() == "") {
+                    $mail->subject("[BLANK EMAIL]");
+                }
+
 
                 $attachmentsArray = [];
 
@@ -248,6 +254,20 @@ class Download
                 // Log::debug("Has attachments, storing");
                 $mail->attachments($attachmentsArray);
                 //Log::debug("stored");
+            } else {
+                        
+                if ($message == "" && $mail->subject() == "") {
+                    return null;
+                }
+
+                if ($message == "") {
+                    $mail->message($mail->subject());
+                }
+
+                if ($mail->subject() == "") {
+                    $mail->subject("[BLANK]");
+                }
+
             }
         
         }
@@ -279,7 +299,7 @@ class Download
         }
 
 
-        // Log::debug("got mail ids");
+        Log::debug("got mail ids: ".print_r($mail_ids, true));
 
         $numberToGet = 0;
         if (count($mail_ids) > 0) {
@@ -315,7 +335,7 @@ class Download
                             ->delay(now()
                             ->addSeconds(15));
                     }
-                    $this->mailbox->deleteMail($mail_id);
+                    
 
                     // Log::debug("deleted mail");
 
@@ -323,6 +343,8 @@ class Download
                         break;
                     }
                 }
+                $this->mailbox->deleteMail($mail_id);
+                
             }
         }
 

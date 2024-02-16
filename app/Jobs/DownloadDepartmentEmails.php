@@ -19,7 +19,7 @@ class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     
-    public $uniqueFor = 3600;
+    // public $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
@@ -29,10 +29,10 @@ class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
         //
     }
 
-    public function uniqueId()
-    {
-        return $this->department->id;
-    }
+    // public function uniqueId()
+    // {
+    //     return $this->department->id;
+    // }
 
 
     /**
