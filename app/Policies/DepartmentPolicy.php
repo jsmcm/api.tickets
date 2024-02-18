@@ -31,7 +31,7 @@ class DepartmentPolicy
     public function create(User $user): bool
     {
         //
-        Log::debug("alsp on dept");
+        Log::debug("also on dept");
     }
 
     /**
@@ -39,7 +39,14 @@ class DepartmentPolicy
      */
     public function update(User $user, Department $department): bool
     {
-        //
+        if (
+            $user->id == $department->user_id  // Canned Reply Owner
+            || $user->level >= 50                           // Admin or higher
+        ) {
+            return true;
+        }
+        
+        return false; 
     }
 
     /**
@@ -47,7 +54,14 @@ class DepartmentPolicy
      */
     public function delete(User $user, Department $department): bool
     {
-        //
+        if (
+            $user->id == $department->user_id  // Canned Reply Owner
+            || $user->level >= 50                           // Admin or higher
+        ) {
+            return true;
+        }
+        
+        return false; 
     }
 
     /**

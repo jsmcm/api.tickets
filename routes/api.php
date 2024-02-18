@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\TicketController;
 use App\Models\Ticket;
+use App\Models\Department;
 use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
@@ -37,6 +38,7 @@ Route::group([
     'middleware' => 'api',
 
 ], function ($router) {
+
 
     Route::get("/tickets/search", "App\Http\Controllers\TicketController@search");
     Route::get("/tickets/user-search", "App\Http\Controllers\TicketController@userSearch");
@@ -89,6 +91,9 @@ Route::group([
     
 
     Route::get("/departments", "App\Http\Controllers\DepartmentController@index");
+    Route::get("/departments/{department}", "App\Http\Controllers\DepartmentController@show");
+    Route::delete("/departments/{department}", "App\Http\Controllers\DepartmentController@destroy");
+    Route::patch("/departments/{department}", "App\Http\Controllers\DepartmentController@update");
 
 });
 
