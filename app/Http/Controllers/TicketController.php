@@ -174,13 +174,13 @@ class TicketController extends Controller
 
         $user = auth()->user();
 
-	if ($user == null) {
-        	return response()->json([
-                	"status" => "error",
-                	"data" => "Not authorized, please log in..."
-            	]
-        	, 401);
-	}
+        if ($user == null) {
+            return response()->json([
+                    "status" => "error",
+                    "data" => "Not authorized, please log in..."
+                ]
+            , 401);
+        }
 
 
         $priority = ["high","normal","low"];
@@ -190,7 +190,8 @@ class TicketController extends Controller
             }
         }
 
-        $tickets = Ticket::whereIn("priority", $priority);
+        $tickets = Ticket::whereHas("department")
+            ->whereIn("priority", $priority);
 
 
         if ($user->level < 10) {
@@ -237,7 +238,7 @@ class TicketController extends Controller
         ->with("department")
         ->withCount("attachement")
         ->with("thread");
-
+        
         return response()->json(
             [
                 "status" => "success",
