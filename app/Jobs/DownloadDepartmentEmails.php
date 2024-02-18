@@ -14,7 +14,7 @@ use App\Services\MailDownloader\Download;
 
 use Illuminate\Support\Facades\Log;
 
-class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
+class DownloadDepartmentEmails implements ShouldQueue //, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -31,7 +31,7 @@ class DownloadDepartmentEmails implements ShouldQueue, ShouldBeUnique
 
     // public function uniqueId()
     // {
-    //     return $this->department->id;
+        // return $this->department->id;
     // }
 
 
