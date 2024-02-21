@@ -28,9 +28,10 @@ class DepartmentController extends Controller
             "mailPassword"      => "required|string",
             "popPort"           => "required|integer",
             "smtpPort"          => "required|integer",
-            "apiBaseUrl"        => "string",
-            "apiToken"          => "string"
+            "apiBaseUrl"        => "nullable|string",
+            "apiToken"          => "nullable|string"
         ]);
+
 
         $departmentService = new DepartmentService();
 
@@ -47,8 +48,8 @@ class DepartmentController extends Controller
                 $validatedData["mailPassword"],
                 $validatedData["popPort"],
                 $validatedData["smtpPort"],
-                $validatedData["apiBaseUrl"],
-                $validatedData["apiToken"]
+                $validatedData["apiBaseUrl"]??"",
+                $validatedData["apiToken"]??""
             );
 
         } catch (\Exception $e) {

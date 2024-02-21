@@ -41,10 +41,12 @@ class Download
         }
         
 
-        // Log::debug("protocol: ".$protocol);
-        // Log::debug("port: ".$port);
-        // Log::debug("connectionType: ".$connectionType);
-
+        Log::debug("protocol: ".$protocol);
+        Log::debug("host: ".$host);
+        Log::debug("port: ".$port);
+        Log::debug("connectionType: ".$connectionType);
+	Log::debug("username: ".$username);
+	Log::debug("password: ".$password);
 
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder

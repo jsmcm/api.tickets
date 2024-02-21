@@ -43,7 +43,8 @@ class DifferentEmailAddress extends Mailable
             $this->config["department"]->mail_password,
             $this->config["department"]->smtp_port,
             [
-                'encryption' => null, // Enable STARTTLS encryption
+		    'encryption' => null, // Enable STARTTLS encryption
+		    'verify_peer' => 0
             ]
         ));
         Mail::setSymfonyTransport($transport);
