@@ -41,9 +41,12 @@ class Download
         }
         
 
-        // Log::debug("protocol: ".$protocol);
-        // Log::debug("port: ".$port);
-        // Log::debug("connectionType: ".$connectionType);
+        Log::debug("host: ".$host);
+        Log::debug("protocol: ".$protocol);
+        Log::debug("port: ".$port);
+        Log::debug("connectionType: ".$connectionType);
+        Log::debug("username: ".$username);
+        Log::debug("password: ".$password);
 
 
         $this->mailbox = new Mailbox(
@@ -51,6 +54,19 @@ class Download
             $username, // Username for the before configured mailbox
             $password // Password for the before configured username
         );
+
+        Log::debug("mailbox: ".print_r($this->mailbox , true));
+        
+        
+
+        $this->mailbox = new Mailbox(
+            '{'.$host.':'.$port.'/'.$protocol.'}INBOX', // IMAP server and mailbox folder
+            $username, // Username for the before configured mailbox
+            $password // Password for the before configured username
+        );
+
+        Log::debug("mailbox: ".print_r($this->mailbox , true));
+        
         
     }
 

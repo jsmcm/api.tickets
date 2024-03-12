@@ -33,7 +33,6 @@ class DepartmentService
             throw new \Exception("Not authorize", 401);
         }
 
-
         $department->department     = $departmentTitle;
         $department->logo_url       = $logoUrl;
         $department->signature      = $signature;
