@@ -115,6 +115,89 @@ class TicketController extends Controller
 
 
 
+    public function createTicket(Request $request)
+    {
+
+        $validatedData = $request->validate([
+            "email"             => "required|email",
+            "firstName"         => "required|string",
+            "departmentEmail"   => "required|integer",
+            "subject"           => "required|string",
+            "message"           => "required|string",
+        ]);
+
+        $departmentService = new DepartmentService();
+
+        $department = $deparmentService->departmentByEmail($validatedData["departmentEmail"]);
+
+        if ($department == false) {
+            return response()->json([
+                "status"    => "error",
+                "message"   => "Department not found"
+            ], 404); 
+        }
+
+
+        $ticketService = new TicketService();
+        try {
+            
+            $ticket = $ticketService->store(
+                $validatedData["subject"],
+                $department->id,
+                $_SERVER["REMOTE_ADDR"],
+                "normal",
+                $validatedData["email"],
+                $validatedData["firstName"]
+            );
+
+            if ($icket) {
+
+                $threadService = new ThreadService();
+
+                try {
+                    
+                    $thread = $threadService->store(
+                        $ticket,
+                        "from-client",
+                        $validatedData["message"],
+                        "",
+                        false
+                    );
+        
+                } catch (\Exception $e) {
+                    return response()->json(
+                        [
+                            "status" => "error", 
+                            "message" => $e->getMessage()
+                        ], 500
+                    );   
+                }
+
+            }
+
+
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => $e->getMessage()
+                ], 500);
+        }
+
+        return response()->json(
+            [
+                "status"    => "success", 
+                "data"      => $ticket->id
+            ], 200
+        );
+
+
+
+    }
+
+
+
+
 
 
     public function show(Ticket $ticket)
