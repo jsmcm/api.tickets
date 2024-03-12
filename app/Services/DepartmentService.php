@@ -33,7 +33,9 @@ class DepartmentService
             throw new \Exception("Not authorize", 401);
         }
 
-	Log::debug("dpeartment: ".$department->department
+
+	/*	
+	Log::debug("dpeartment in services: ".$department->department
 		."\r\nlogo: ".$logoUrl
 		."\r\nsig: ".$signature
 		."\r\nmail_host: ".$mailHost
@@ -45,6 +47,7 @@ class DepartmentService
 		."\r\napiurl: ".$apiBaseUrl
 		."\r\ntoken: ".$apiToken
 	);
+	*/
 
         $department->department     = $departmentTitle;
         $department->logo_url       = $logoUrl;
@@ -55,11 +58,11 @@ class DepartmentService
         $department->mail_username  = $mailUsername;
         $department->mail_password  = $mailPassword;
         $department->email_address  = $departmentEmail;
-        $department->api_token      = $apiBaseUrl;
-        $department->api_base_url   = $apiToken;
-
+        $department->api_base_url   = $apiBaseUrl;
+        $department->api_token      = $apiToken;
 
         $department->save();
+
 
         return true;
 
