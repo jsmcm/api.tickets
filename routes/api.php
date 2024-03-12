@@ -110,3 +110,6 @@ Route::group([
     Route::post('me', 'App\Http\Controllers\AuthController@me');
 
 });
+
+
+Route::get("create-ticket", "App\Http\Controllers\TicketController@createTicket");

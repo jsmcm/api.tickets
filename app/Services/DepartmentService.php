@@ -12,6 +12,23 @@ use Illuminate\Support\Str;
 class DepartmentService
 {
 
+    
+    public function departmentByEmail(string $email)
+    {
+        
+        $department = Department::where([
+            "email_address" => $email
+        ])->first();
+
+
+        if (isset($department->id)) {
+            return $department;
+        }
+
+        return false;
+
+    }
+
     public function update(
         Department $department,
         string $departmentEmail,
