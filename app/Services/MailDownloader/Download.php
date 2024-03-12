@@ -345,9 +345,31 @@ class Download
 
                     //Log::debug(print_r($mail, true));
 
+                    $sentTo = "";
+                    if (isset($mail->headers()["Envelope-to"])) {
+                        $sentTo = $mail->headers()["Envelope-to"];
+                    } else if (isset($mail->headers()["Delivered-To"])) {
+                        $sentTo = $mail->headers()["Delivered-To"];
+                    }
+
+
+                    $mailArray = [
+                        "sentTo"        => $sentTo,
+                        "returnPath"    => $returnPath,
+                        "fromAddress"   => $mail->fromAddress(),
+                        "subject"       => $mail->subject(),
+                        "ip"            => $mail->ips()[0],
+                        "fromAddress"   => $mail->fromAddress(),
+                        "fromName"      => $mail->fromName(),
+                        "message"       => $mail->message(),
+                        "attachments"   => $mail->attachments()
+                    ];
+
+
+
                     // Ignore bounces
                     if ($returnPath != "<>") {
-                        $this->callbackJob::dispatch($mail)
+                        $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
                             ->addSeconds(15));
                     }
