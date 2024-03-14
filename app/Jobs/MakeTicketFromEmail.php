@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Services\TicketService;
 use Illuminate\Support\Facades\Log;
 
-use App\Services\MailDownloader\Mail;
+// use App\Services\MailDownloader\Mail;
 use App\Services\ThreadService;
 use App\Models\Department;
 use App\Models\Ticket;
@@ -29,7 +29,7 @@ class MakeTicketFromEmail implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private Mail $mail)
+    public function __construct(private Array $mail)
     {
         //
     }
@@ -41,24 +41,20 @@ class MakeTicketFromEmail implements ShouldQueue
     {
         //
 
-        $sentTo = "";
-        if (isset($this->mail->headers()["Envelope-to"])) {
-            $sentTo = $this->mail->headers()["Envelope-to"];
-        } else if (isset($this->mail->headers()["Delivered-To"])) {
-            $sentTo = $this->mail->headers()["Delivered-To"];
-        }
-
-	Log::debug("sentTo: ".$sentTo);
-	Log::debug("fromAddress: ".$this->mail->fromAddress());
+        Log::debug("in makeTicketFromEmail");
+        Log::debug(print_r($mail,true));
+        
+        Log::debug("sentTo: ".$mail->sentTo);
+        Log::debug("fromAddress: ".$this->mail->fromAddress);
         $department = Department::where(["email_address" => $sentTo])->first();
-	Log::debug("Dept: ".print_r($department, true));
+	    Log::debug("Dept: ".print_r($department, true));
 
         $ticket = null;
 
         $isNewTicket = true;
-        Log::debug("Subject is: " . $this->mail->subject());
+        Log::debug("Subject is: " . $this->mail->subject);
 
-        if(preg_match ("/[[][#][a-fA-F0-9]{5,15}[]]/",$this->mail->subject(), $regs)) {
+        if(preg_match ("/[[][#][a-fA-F0-9]{5,15}[]]/",$this->mail->subject, $regs)) {
             Log::debug("regs are: ".print_r($regs, true));
             
             // [#00035]
@@ -73,13 +69,13 @@ class MakeTicketFromEmail implements ShouldQueue
 
             $ticket = Ticket::find($ticketId);
 
-            Log::debug("email is from: ".$this->mail->fromAddress());
+            Log::debug("email is from: ".$this->mail->fromAddress);
 
             Log::debug("ticket email : ".$ticket->user->email);
 
-            if ($this->mail->fromAddress() != $ticket->user->email) {
+            if ($this->mail->fromAddress != $ticket->user->email) {
                 Log::debug("ticket does not belong to this email....");
-                DifferentEmailAddressEmail::dispatch($ticket->department, $this->mail->fromAddress(), $this->mail->subject(), $ticket->id);
+                DifferentEmailAddressEmail::dispatch($ticket->department, $this->mail->fromAddress, $this->mail->subject, $ticket->id);
                 return;
                 //throw new \Exception("Email received for ticket from different email address. Expected from: ".$ticket->user->email." but received from: ".$this->mail->fromAddress());
             }
@@ -91,12 +87,12 @@ class MakeTicketFromEmail implements ShouldQueue
             $ticketService = new TicketService();
 
             $ticket = $ticketService->store(
-                $this->mail->subject(),
+                $this->mail->subject,
                 $department->id,
-                $this->mail->ips()[0],
+                $this->mail->ip,
                 "normal",
-                $this->mail->fromAddress(),
-                $this->mail->fromName()
+                $this->mail->fromAddress,
+                $this->mail->fromName
             );
         } else {
             if ($ticket->status == "closed") {
@@ -111,7 +107,7 @@ class MakeTicketFromEmail implements ShouldQueue
         $thread = $threadService->store(
             $ticket,
             "from-client",
-            $this->mail->message(),
+            $this->mail->message,
             Str::random(32),
             true
         );
@@ -120,7 +116,7 @@ class MakeTicketFromEmail implements ShouldQueue
         // Log::debug("mail: ".print_r($this->mail, true));
 
 
-        $attachments = $this->mail->attachments();
+        $attachments = $this->mail->attachments;
 
         // Log::debug("attachments: ".count($attachments));
 
@@ -152,7 +148,6 @@ class MakeTicketFromEmail implements ShouldQueue
         }
 
 
-
-
     }
+
 }
