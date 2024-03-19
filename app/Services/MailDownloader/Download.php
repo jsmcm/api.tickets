@@ -258,7 +258,7 @@ class Download
                 // Log::debug(print_r($email->getAttachments(), true));;
                 // Log::debug("Has attachments, storing");
                 $mail->attachments($attachmentsArray);
-                //Log::debug("stored");.
+                //Log::debug("stored");
             } else {
                         
                 if ($message == "" && $mail->subject() == "") {
