@@ -254,6 +254,7 @@ class Download
 
                 }
 
+                
                 //Log::debug("getAttachments:");
                 // Log::debug(print_r($email->getAttachments(), true));;
                 // Log::debug("Has attachments, storing");
