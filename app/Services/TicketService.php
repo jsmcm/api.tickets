@@ -179,6 +179,8 @@ class TicketService
 
         $ticket->save();
 
+        // Log::debug("in Services->TicketService calling TicketCreatedEmail with subject: `$subject` and ticketId: `$ticket->id`");
+
         TicketCreatedEmail::dispatch(Department::find($departmentId), $email, $subject, $ticket->id);
         //TicketCreatedEmail::dispatch(Department::find($departmentId), "john@softsmart.co.za", $subject, $ticket->id);
 

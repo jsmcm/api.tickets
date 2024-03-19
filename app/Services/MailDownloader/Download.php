@@ -41,12 +41,12 @@ class Download
         }
         
 
-        Log::debug("host: ".$host);
-        Log::debug("protocol: ".$protocol);
-        Log::debug("port: ".$port);
-        Log::debug("connectionType: ".$connectionType);
-        Log::debug("username: ".$username);
-        Log::debug("password: ".$password);
+        // Log::debug("host: ".$host);
+        // Log::debug("protocol: ".$protocol);
+        // Log::debug("port: ".$port);
+        // Log::debug("connectionType: ".$connectionType);
+        // Log::debug("username: ".$username);
+        // Log::debug("password: ".$password);
 
 
         $this->mailbox = new Mailbox(
@@ -55,7 +55,7 @@ class Download
             $password // Password for the before configured username
         );
 
-        Log::debug("mailbox: ".print_r($this->mailbox , true));
+        // Log::debug("mailbox: ".print_r($this->mailbox , true));
         
     }
 
@@ -305,7 +305,7 @@ class Download
         }
 
 
-        Log::debug("got mail ids: ".print_r($mail_ids, true));
+        // Log::debug("got mail ids: ".print_r($mail_ids, true));
 
         $numberToGet = 0;
         if (count($mail_ids) > 0) {
@@ -315,22 +315,22 @@ class Download
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
                     
 
-                    Log::debug("got mail");
-                    Log::debug("DT: ".print_r($mail->headers(), true));
+                    // Log::debug("got mail");
+                    // Log::debug("DT: ".print_r($mail->headers(), true));
 
-                    if (isset($mail->headers()["Envelope-to"])) {
-                        Log::debug("DT: ".$mail->headers()["Envelope-to"]);
-                    } else if (isset($mail->headers()["Delivered-To"])) {
-                        Log::debug("DT: ".$mail->headers()["Delivered-To"]);
-                    }
+                    // if (isset($mail->headers()["Envelope-to"])) {
+                    //     Log::debug("DT: ".$mail->headers()["Envelope-to"]);
+                    // } else if (isset($mail->headers()["Delivered-To"])) {
+                    //     Log::debug("DT: ".$mail->headers()["Delivered-To"]);
+                    // }
 
 
 
-                    Log::debug("to: ".$mail->headers()["To"]);
+                    // Log::debug("to: ".$mail->headers()["To"]);
 
-                    Log::debug("from: ".$mail->headers()["From"]);
+                    // Log::debug("from: ".$mail->headers()["From"]);
 
-                    Log::debug("subject: ".$mail->headers()["Subject"]);
+                    // Log::debug("subject: ".$mail->headers()["Subject"]);
 
                     $returnPath = "";
                     if (isset($mail->headers()["Return-Path"])) {
@@ -338,9 +338,9 @@ class Download
                     } else if (isset($mail->headers()["Return-path"])) {
                         $returnPath = $mail->headers()["Return-path"];
                     }
-                    Log::debug("returnPath: ".$returnPath);
+                    // Log::debug("returnPath: ".$returnPath);
 
-                    Log::debug(print_r($mail, true));
+                    // Log::debug(print_r($mail, true));
 
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
@@ -379,10 +379,8 @@ class Download
                 }
 
                 if (config("tickets.delete_after_download") == true) {
-                    Log::debug("delete_after_download is true...");
+                    // Log::debug("delete_after_download is true...");
                     $this->mailbox->deleteMail($mail_id);
-                } else {
-                    Log::debug("delete_after_download is false...");
                 }
                 
             }

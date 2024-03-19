@@ -41,21 +41,21 @@ class MakeTicketFromEmail implements ShouldQueue
     {
         //
 
-        Log::debug("in makeTicketFromEmail");
-        Log::debug(print_r($this->mail,true));
+        // Log::debug("in makeTicketFromEmail");
+        // Log::debug(print_r($this->mail,true));
         
-        Log::debug("sentTo: ".$this->mail["sentTo"]);
-        Log::debug("fromAddress: ".$this->mail["fromAddress"]);
+        // Log::debug("sentTo: ".$this->mail["sentTo"]);
+        // Log::debug("fromAddress: ".$this->mail["fromAddress"]);
         $department = Department::where(["email_address" => $this->mail["sentTo"]])->first();
-	    Log::debug("Dept: ".print_r($department, true));
+	    // Log::debug("Dept: ".print_r($department, true));
 
         $ticket = null;
 
         $isNewTicket = true;
-        Log::debug("Subject is: " . $this->mail["subject"]);
+        // Log::debug("Subject is: " . $this->mail["subject"]);
 
         if(preg_match ("/[[][#][a-fA-F0-9]{5,15}[]]/",$this->mail["subject"], $regs)) {
-            Log::debug("regs are: ".print_r($regs, true));
+            // Log::debug("regs are: ".print_r($regs, true));
             
             // [#00035]
             $ticketId = hexdec(str_replace([
@@ -64,32 +64,29 @@ class MakeTicketFromEmail implements ShouldQueue
                 "]"
             ], '', $regs[0]));
 
-            Log::debug("ticketId: ".$ticketId);
+            // Log::debug("ticketId: ".$ticketId);
 
 
             $ticket = Ticket::find($ticketId);
 
-            Log::debug("ticket: ".print_r($ticket, true));
+            // Log::debug("ticket: ".print_r($ticket, true));
 
             if ($ticket !== null) {
-                Log::debug("Ticket found..");
+                // Log::debug("Ticket found..");
             
-                Log::debug("email is from: ".$this->mail["fromAddress"]);
+                // Log::debug("email is from: ".$this->mail["fromAddress"]);
 
-                Log::debug("ticket email : ".$ticket->user->email);
+                // Log::debug("ticket email : ".$ticket->user->email);
 
-                if ($this->mail->fromAddress != $ticket->user->email) {
-                    Log::debug("ticket does not belong to this email....");
+                if ($this->mail["fromAddress"] != $ticket->user->email) {
+                    // Log::debug("ticket does not belong to this email....");
                     DifferentEmailAddressEmail::dispatch($ticket->department, $this->mail["fromAddress"], $this->mail["subject"], $ticket->id);
                     return;
                     //throw new \Exception("Email received for ticket from different email address. Expected from: ".$ticket->user->email." but received from: ".$this->mail->fromAddress());
                 }
 
                 $isNewTicket = false;
-            } else {
-                Log::debug("no ticket found");
             }
-
         }
 
         if ($isNewTicket) {
@@ -127,7 +124,7 @@ class MakeTicketFromEmail implements ShouldQueue
 
         $attachments = $this->mail["attachments"];
 
-        Log::debug("attachments: ".count($attachments));
+        // Log::debug("attachments: ".count($attachments));
 
         if (!empty($attachments)) {
             

@@ -32,14 +32,15 @@ class TicketCreatedEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        //
-        //Log::write("debug", "in SendEmail...(".$this->department->host_name.")");
+        
+        // Log::write("debug", "in SendEmail...(".$this->department->host_name."); subject: ".$this->subject."; ticketId: ".$this->ticketId);
+
         Mail::to($this->email)->send(new TicketCreated([
             "subject"       => $this->subject,
             "ticketId"      => $this->ticketId,
             "department"    => $this->department
         ]));
 
-        
     }
+
 }
