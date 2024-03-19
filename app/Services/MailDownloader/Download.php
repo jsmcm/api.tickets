@@ -325,15 +325,15 @@ class Download
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
                     
 
-                    // Log::debug("got mail");
-                    // Log::debug("DT: ".print_r($mail->headers(), true));
-                    // Log::debug("DT: ".$mail->headers()["Delivered-To"]);
+                    Log::debug("got mail");
+                    Log::debug("DT: ".print_r($mail->headers(), true));
+                    Log::debug("DT: ".$mail->headers()["Delivered-To"]);
 
-                    // Log::debug("to: ".$mail->headers()["To"]);
+                    Log::debug("to: ".$mail->headers()["To"]);
 
-                    // Log::debug("from: ".$mail->headers()["From"]);
+                    Log::debug("from: ".$mail->headers()["From"]);
 
-                    // Log::debug("subject: ".$mail->headers()["Subject"]);
+                    Log::debug("subject: ".$mail->headers()["Subject"]);
 
                     $returnPath = "";
                     if (isset($mail->headers()["Return-Path"])) {
@@ -341,9 +341,9 @@ class Download
                     } else if (isset($mail->headers()["Return-path"])) {
                         $returnPath = $mail->headers()["Return-path"];
                     }
-                    // Log::debug("returnPath: ".$returnPath);
+                    Log::debug("returnPath: ".$returnPath);
 
-                    //Log::debug(print_r($mail, true));
+                    Log::debug(print_r($mail, true));
 
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
@@ -375,13 +375,18 @@ class Download
                     }
                     
 
-                    // Log::debug("deleted mail");
 
                     if ($numberToGet++ >= 25) {
                         break;
                     }
                 }
-                $this->mailbox->deleteMail($mail_id);
+
+                if (config("app.tickets.delete_after_download") == true) {
+                    Log::debug("delete_after_download is true...");
+                    $this->mailbox->deleteMail($mail_id);
+                } else {
+                    Log::debug("delete_after_download is false...");
+                }
                 
             }
         }
