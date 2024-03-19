@@ -373,12 +373,12 @@ class Download
                     
 
 
-                    if ($numberToGet++ >= config("all.tickets.download_per_round")) {
+                    if ($numberToGet++ >= config("tickets.download_per_round")) {
                         break;
                     }
                 }
 
-                if (config("app.tickets.delete_after_download") == true) {
+                if (config("tickets.delete_after_download") == true) {
                     Log::debug("delete_after_download is true...");
                     $this->mailbox->deleteMail($mail_id);
                 } else {
