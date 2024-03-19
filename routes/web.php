@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use App\Services\MailDownloader\Download;
 use Illuminate\Support\Facades\Cache;
 
+use App\Jobs\DownloadEmails;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,12 @@ use Illuminate\Support\Facades\Cache;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get("/run", function () {
+    
+    DownloadEmails::dispatch();
+
+});
 
 Route::get('/', function () {
     return "<a href='https://softsmart.co.za'>SoftSmart.co.za</a>";

@@ -57,17 +57,6 @@ class Download
 
         Log::debug("mailbox: ".print_r($this->mailbox , true));
         
-        
-
-        $this->mailbox = new Mailbox(
-            '{'.$host.':'.$port.'/'.$protocol.'}INBOX', // IMAP server and mailbox folder
-            $username, // Username for the before configured mailbox
-            $password // Password for the before configured username
-        );
-
-        Log::debug("mailbox: ".print_r($this->mailbox , true));
-        
-        
     }
 
 
@@ -327,7 +316,14 @@ class Download
 
                     Log::debug("got mail");
                     Log::debug("DT: ".print_r($mail->headers(), true));
-                    Log::debug("DT: ".$mail->headers()["Delivered-To"]);
+
+                    if (isset($mail->headers()["Envelope-to"])) {
+                        Log::debug("DT: ".$mail->headers()["Envelope-to"]);
+                    } else if (isset($mail->headers()["Delivered-To"])) {
+                        Log::debug("DT: ".$mail->headers()["Delivered-To"]);
+                    }
+
+
 
                     Log::debug("to: ".$mail->headers()["To"]);
 
@@ -376,7 +372,7 @@ class Download
                     
 
 
-                    if ($numberToGet++ >= 25) {
+                    if ($numberToGet++ >= config("all.tickets.download_per_round")) {
                         break;
                     }
                 }
@@ -401,6 +397,9 @@ class Download
 
         $this->mailbox->expungeDeletedMails();
         $this->mailbox->disconnect();
+
+
+        
     }
 
 }
