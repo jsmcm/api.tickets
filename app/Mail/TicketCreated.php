@@ -27,13 +27,6 @@ class TicketCreated extends Mailable
     public function build()
     {
 
-        // Log::write("debug", "in build...");
-
-        // Log::write("debug", "host: ".$this->config["department"]->mail_host);
-        // Log::write("debug", "user: ".$this->config["department"]->mail_username);
-        // Log::write("debug", "pass: ".$this->config["department"]->mail_password);
-        // Log::write("debug", "port: ".$this->config["department"]->smtp_port);
-
         $factory = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory();
 
         $transport = $factory->create(new \Symfony\Component\Mailer\Transport\Dsn(
@@ -57,11 +50,9 @@ class TicketCreated extends Mailable
      */
     public function envelope(): Envelope
     {
-        // Log::write("debug", "in envelope...");
-        // Log::write("debug", "from: ".$this->config["department"]->email_address);
 
         return new Envelope(
-            subject: "[#".str_pad(dechex($this->config["ticketId"]), 5, "0", STR_PAD_LEFT)."] Ticket Created",
+            subject: "(#".str_pad(dechex($this->config["ticketId"]), 5, "0", STR_PAD_LEFT).") Ticket Created",
             from: $this->config["department"]->email_address
         );
     }

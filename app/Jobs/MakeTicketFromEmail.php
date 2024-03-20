@@ -10,9 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Services\TicketService;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
-// use App\Services\MailDownloader\Mail;
 use App\Services\ThreadService;
 use App\Models\Department;
 use App\Models\Ticket;
@@ -39,44 +38,26 @@ class MakeTicketFromEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        //
-
-        // Log::debug("in makeTicketFromEmail");
-        // Log::debug(print_r($this->mail,true));
-        
-        // Log::debug("sentTo: ".$this->mail["sentTo"]);
-        // Log::debug("fromAddress: ".$this->mail["fromAddress"]);
         $department = Department::where(["email_address" => $this->mail["sentTo"]])->first();
-	    // Log::debug("Dept: ".print_r($department, true));
 
         $ticket = null;
 
         $isNewTicket = true;
-        // Log::debug("Subject is: " . $this->mail["subject"]);
 
-        if(preg_match ("/[[][#][a-fA-F0-9]{5,15}[]]/",$this->mail["subject"], $regs)) {
-            // Log::debug("regs are: ".print_r($regs, true));
+        if(preg_match ("/[(][#][a-fA-F0-9]{5,15}[)]/",$this->mail["subject"], $regs)) {
             
             // [#00035]
             $ticketId = hexdec(str_replace([
-                "[",
+                "(",
                 "#",
-                "]"
+                ")"
             ], '', $regs[0]));
-
-            // Log::debug("ticketId: ".$ticketId);
 
 
             $ticket = Ticket::find($ticketId);
 
-            // Log::debug("ticket: ".print_r($ticket, true));
 
             if ($ticket !== null) {
-                // Log::debug("Ticket found..");
-            
-                // Log::debug("email is from: ".$this->mail["fromAddress"]);
-
-                // Log::debug("ticket email : ".$ticket->user->email);
 
                 if ($this->mail["fromAddress"] != $ticket->user->email) {
                     // Log::debug("ticket does not belong to this email....");
@@ -119,28 +100,12 @@ class MakeTicketFromEmail implements ShouldQueue
         );
 
 
-        // Log::debug("mail: ".print_r($this->mail, true));
-
 
         $attachments = $this->mail["attachments"];
-
-        // Log::debug("attachments: ".count($attachments));
 
         if (!empty($attachments)) {
             
             foreach ($attachments as $attachment) {
-
-                // Log::debug("attachment: ".print_r($attachment, true));
-
-            //     $randomString = date("Ydm_His")."_".Str::random(48);
-            //     $path = "attachements/temp/".$randomString."_".$attachment->id."_".$attachment->name;
-
-            //     // Log::debug("move: ".$attachment->path." to ".$path);
-            //    Storage::disk("s3_file_storage")->put(
-            //         $path,
-            //         $attachment->data,
-            //         "public"
-            //     );
 
                 $attachmentModel                = new Attachement();
                 $attachmentModel->ticket_id     = $ticket->id;

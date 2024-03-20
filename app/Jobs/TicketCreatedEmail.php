@@ -13,7 +13,7 @@ use App\Models\Department;
 use App\Mail\TicketCreated;
 use Illuminate\Support\Facades\Mail;
 
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
 class TicketCreatedEmail implements ShouldQueue
 {
@@ -33,11 +33,10 @@ class TicketCreatedEmail implements ShouldQueue
     public function handle(): void
     {
         
-        // Log::write("debug", "in SendEmail...(".$this->department->host_name."); subject: ".$this->subject."; ticketId: ".$this->ticketId);
-
         Mail::to($this->email)->send(new TicketCreated([
             "subject"       => $this->subject,
-            "ticketId"      => $this->ticketId,
+	    "ticketId"      => $this->ticketId,
+	    "cacheBuster"   => date("YmdHis"),
             "department"    => $this->department
         ]));
 
