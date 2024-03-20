@@ -29,18 +29,10 @@ class ThreadReplyCreated extends Mailable
     public function build()
     {
 
-        Log::write("debug", "in build...");
-
-
         $factory = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory();
 
         $ticket = $this->thread->ticket;
         $department = $ticket->department;
-
-        Log::write("debug", "host: ".$department->mail_host);
-        Log::write("debug", "user: ".$department->mail_username);
-        Log::write("debug", "pass: ".$department->mail_password);
-	Log::write("debug", "port: ".$department->smtp_port);
 
         $transport = $factory->create(new \Symfony\Component\Mailer\Transport\Dsn(
             "smtp",
@@ -63,14 +55,12 @@ class ThreadReplyCreated extends Mailable
      */
     public function envelope(): Envelope
     {
-        Log::write("debug", "in envelope...");
-        $ticket = $this->thread->ticket;
+
+        $ticket     = $this->thread->ticket;
         $department = $ticket->department;
 
-	Log::write("debug", "from: ".$department->email_address);
-
         return new Envelope(
-            subject: "[#".str_pad(dechex($ticket->id), 5, "0", STR_PAD_LEFT)."] New Reply on Ticket",
+            subject: "(#".str_pad(dechex($ticket->id), 5, "0", STR_PAD_LEFT).") New Reply on Ticket",
             from: $department->email_address
         );
     }
@@ -105,7 +95,6 @@ class ThreadReplyCreated extends Mailable
     public function attachments(): array
     {
 
-
         $threadAttachements = $this->thread->attachement;
 
         $attachments = [];
@@ -121,9 +110,10 @@ class ThreadReplyCreated extends Mailable
             $fileName = substr($fileUrl, strpos($fileUrl, "_",  strpos($fileUrl, "_",  strpos($fileUrl, "_") + 1) + 1) + 1);
 
             $attachments[] = attachment::fromStorage($fileUrl)
-                                ->as($fileName);
+                ->as($fileName);
         }
 
         return $attachments;
     }
+    
 }

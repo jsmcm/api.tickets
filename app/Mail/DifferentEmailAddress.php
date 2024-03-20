@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
 
 class DifferentEmailAddress extends Mailable
@@ -26,13 +26,6 @@ class DifferentEmailAddress extends Mailable
 
     public function build()
     {
-
-        // Log::write("debug", "in build...");
-
-        // Log::write("debug", "host: ".$this->config["department"]->mail_host);
-        // Log::write("debug", "user: ".$this->config["department"]->mail_username);
-        // Log::write("debug", "pass: ".$this->config["department"]->mail_password);
-        // Log::write("debug", "port: ".$this->config["department"]->smtp_port);
 
         $factory = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory();
 
@@ -57,8 +50,6 @@ class DifferentEmailAddress extends Mailable
      */
     public function envelope(): Envelope
     {
-        // Log::write("debug", "in envelope...");
-        // Log::write("debug", "from: ".$this->config["department"]->email_address);
 
         return new Envelope(
             subject: "Incorrect Email Address",

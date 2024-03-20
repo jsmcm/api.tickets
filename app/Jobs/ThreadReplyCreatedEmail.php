@@ -31,7 +31,7 @@ class ThreadReplyCreatedEmail implements ShouldQueue
     public function handle(): void
     {
         $ticket = $this->thread->ticket;
-        $user = $ticket->user;
+        $user   = $ticket->user;
 
         Mail::to($user->email)->send(
             new ThreadReplyCreated($this->thread)

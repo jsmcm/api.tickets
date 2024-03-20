@@ -40,10 +40,6 @@ class DownloadDepartmentEmails implements ShouldQueue //, ShouldBeUnique
      */
     public function handle(): void
     {
-        //
-
-
-        // Log::debug("downloading emails for dept: ".$this->department->department);
 
         $download = new Download(
             $this->department->mail_username,

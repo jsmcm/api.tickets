@@ -38,11 +38,9 @@ class MakeTicketFromEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        $department = Department::where(["email_address" => $this->mail["sentTo"]])->first();
-
-        $ticket = null;
-
-        $isNewTicket = true;
+        $department     = Department::where(["email_address" => $this->mail["sentTo"]])->first();
+        $ticket         = null;
+        $isNewTicket    = true;
 
         if(preg_match ("/[(][#][a-fA-F0-9]{5,15}[)]/",$this->mail["subject"], $regs)) {
             

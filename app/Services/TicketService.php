@@ -158,11 +158,12 @@ class TicketService
         ])->first();
 
         if ($user == null) {
-            $user = new User();
-            $user->level = 1;
-            $user->name = $firstName;
-            $user->email = $email;
+            $user           = new User();
+            $user->level    = 1;
+            $user->name     = $firstName;
+            $user->email    = $email;
             $user->password = Hash::make(date("Y-m-d H:i:s").mt_rand(10000, 99999).mt_rand(10000, 99999));
+
             $user->save();
         }
     
@@ -170,19 +171,16 @@ class TicketService
         
         $ticket = new Ticket();
 
-        $ticket->department_id = $departmentId;
-        $ticket->user_id = $user->id;
-        $ticket->subject = $subject;
-        $ticket->ip = $ip;
-        $ticket->folder_hash = date("YmdHis")."_".Str::random(10);
-        $ticket->priority = $priority;
+        $ticket->department_id  = $departmentId;
+        $ticket->user_id        = $user->id;
+        $ticket->subject        = $subject;
+        $ticket->ip             = $ip;
+        $ticket->folder_hash    = date("YmdHis")."_".Str::random(10);
+        $ticket->priority       = $priority;
 
         $ticket->save();
 
-        // Log::debug("in Services->TicketService calling TicketCreatedEmail with subject: `$subject` and ticketId: `$ticket->id`");
-
         TicketCreatedEmail::dispatch(Department::find($departmentId), $email, $subject, $ticket->id);
-        //TicketCreatedEmail::dispatch(Department::find($departmentId), "john@softsmart.co.za", $subject, $ticket->id);
 
         return $ticket;
 
@@ -201,9 +199,9 @@ class TicketService
         }
 
 
-        $gainingTicket->subject = $gainingTicket->subject." (".$lostingTicket->subject.")";
-        $lostingTicket->deleted_at = date("Y-m-d H:i:s");
-        $lostingTicket->subject = $lostingTicket->subject." (merged with ".$gainingTicket->id.")";
+        $gainingTicket->subject     = $gainingTicket->subject." (".$lostingTicket->subject.")";
+        $lostingTicket->deleted_at  = date("Y-m-d H:i:s");
+        $lostingTicket->subject     = $lostingTicket->subject." (merged with ".$gainingTicket->id.")";
 
         $gainingTicket->save();
         $lostingTicket->save();

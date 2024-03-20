@@ -35,8 +35,7 @@ class TicketCreatedEmail implements ShouldQueue
         
         Mail::to($this->email)->send(new TicketCreated([
             "subject"       => $this->subject,
-	    "ticketId"      => $this->ticketId,
-	    "cacheBuster"   => date("YmdHis"),
+            "ticketId"      => $this->ticketId,
             "department"    => $this->department
         ]));
 

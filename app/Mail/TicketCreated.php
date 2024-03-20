@@ -51,6 +51,20 @@ class TicketCreated extends Mailable
     public function envelope(): Envelope
     {
 
+        /*
+        future dev, this is a problem (not really, but kindof).
+        Originally emails would be sent with a subject like this: '[#04b4c] Ticket Created"
+        where the number is square brackets is the hex representation of the ticket id.
+        The problem is with the subject line below the closing ] causes the subject line
+        to cache to the first instance of it, so for instance if it sent out
+        '[#00302] Ticket Created', it would keep sending that over and over.
+
+        I'm not sure if this 'caching' persists across email addresses. Interestingly if I left 
+        off the closing ] it worked, eg: '[#00302 Ticket Created'.
+
+        My guess is that because ] is a special character in regexes something is happening on 
+        that front, but for now I'm simply changing to ()
+        */
         return new Envelope(
             subject: "(#".str_pad(dechex($this->config["ticketId"]), 5, "0", STR_PAD_LEFT).") Ticket Created",
             from: $this->config["department"]->email_address
