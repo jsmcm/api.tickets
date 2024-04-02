@@ -38,12 +38,8 @@ class ThreadService
         
         $thread->save();
 
-        // Log::debug("thread->id: ".$thread->id);
-
         if ($thread->id) {
 
-            // Log::debug("randomString: ".$randomString);
-        
             // update attachements
             Attachement::where(["random_string" => $randomString])
                 ->update([

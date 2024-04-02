@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Services\TicketService;
-// use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
 use App\Services\ThreadService;
 use App\Models\Department;
@@ -38,7 +38,13 @@ class MakeTicketFromEmail implements ShouldQueue
      */
     public function handle(): void
     {
+
         $department     = Department::where(["email_address" => $this->mail["sentTo"]])->first();
+        
+        if ($department == null) {
+            return;
+        }
+
         $ticket         = null;
         $isNewTicket    = true;
 
@@ -52,7 +58,8 @@ class MakeTicketFromEmail implements ShouldQueue
             ], '', $regs[0]));
 
 
-            $ticket = Ticket::find($ticketId);
+            $ticket = Ticket::withTrashed()
+                ->find($ticketId);
 
 
             if ($ticket !== null) {
@@ -80,10 +87,9 @@ class MakeTicketFromEmail implements ShouldQueue
                 $this->mail["fromName"]
             );
         } else {
-            if ($ticket->status == "closed") {
-                $ticket->status = "open";
-                $ticket->save();
-            }
+            $ticket->status = "open";
+            $ticket->deleted_at = null;
+            $ticket->save();
         }
 
 

@@ -41,22 +41,12 @@ class Download
         }
         
 
-        // Log::debug("host: ".$host);
-        // Log::debug("protocol: ".$protocol);
-        // Log::debug("port: ".$port);
-        // Log::debug("connectionType: ".$connectionType);
-        // Log::debug("username: ".$username);
-        // Log::debug("password: ".$password);
-
-
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
             $password // Password for the before configured username
         );
 
-        // Log::debug("mailbox: ".print_r($this->mailbox , true));
-        
     }
 
 
@@ -72,9 +62,7 @@ class Download
         $mailDomain = substr($email, strpos($email, "@") +  1);
 
         if ($mailDomain == "gmail.com" || $mailDomain == "googlemail.com") {
-
             $mailUser = str_replace(".", "", $mailUser);
-
             $email = $mailUser."@".$mailDomain;
         }
 
@@ -110,15 +98,11 @@ class Download
         // this is the mail object we'll return
         $mail = new Mail();
 
-        // Log::debug("in fetchEmail, gettingMail");
-
         $email = $mailbox->getMail(
             $mail_id, // ID of the email, you want to get
             true //false // Do NOT mark emails as seen (optional)
         );
 
-
-        // Log::debug("got it");
 
         $header = $mailbox->getMailHeader($mail_id)->headersRaw;
 
@@ -182,28 +166,20 @@ class Download
         }
 
         
-        
-	    //file_put_contents(dirname(__DIR__)."/tmp/support_emails/".$fileTimeStamp."/".$logTimeStamp.".txt", "emailParser: ".print_r($emailParser, true)."\r\n", FILE_APPEND);
-        
         $fragments = $emailFragments->getFragments();
-	    //file_put_contents(dirname(__DIR__)."/tmp/support_emails/".$fileTimeStamp."/".$logTimeStamp.".txt", "fragments: ".print_r($fragments, true)."\r\n", FILE_APPEND);
-        
+	    
 
         $message = "";
 
-        // Log::debug("loading fragments");
         foreach($fragments as $fragment) {
             $message .= $fragment->getContent();
         }
 
-        // Log::debug("got fragments");
         $mail->message($message);
         
 
-        //Log::debug("checking for attachments");
         if (!$mailbox->getAttachmentsIgnore()) {  
 
-            //Log::debug("really checking for attachments");
             if ($email->hasAttachments()) {
 
                 // we set blank message and subjects here because if they
@@ -225,13 +201,9 @@ class Download
                     
                     $attachmentObject = new \stdClass();
 
-                    //$path = storage_path("/app/".(string) $attachment->id);
-                    //$attachment->setFilePath($path);
-
                     $randomString = date("Ydm_His")."_".Str::random(48);
                     $path = "attachements/temp/".$randomString."_".$attachment->id."_".$attachment->name;
     
-                    // Log::debug("move: ".$attachment->path." to ".$path);
                     Storage::disk("s3_file_storage")->put(
                         $path,
                         $attachment->getContents(),
@@ -239,27 +211,20 @@ class Download
                     );
 
 
-                    //if ($attachment->saveToDisk()) {
-                        //Log::debug("attachment saved as /tmp/".(string) $attachment->id);
-                        $attachmentObject->id               = (string) $attachment->id;
-                        $attachmentObject->path             = $path;
-                        $attachmentObject->randomString     = $randomString;
-                        $attachmentObject->name             = $attachment->name;
-                        $attachmentObject->sizeInBytes      = $attachment->sizeInBytes;
-                        $attachmentObject->mime             = $attachment->mime;
-                        $attachmentObject->fileExtension    = $attachment->fileExtension;
+                    $attachmentObject->id               = (string) $attachment->id;
+                    $attachmentObject->path             = $path;
+                    $attachmentObject->randomString     = $randomString;
+                    $attachmentObject->name             = $attachment->name;
+                    $attachmentObject->sizeInBytes      = $attachment->sizeInBytes;
+                    $attachmentObject->mime             = $attachment->mime;
+                    $attachmentObject->fileExtension    = $attachment->fileExtension;
 
-                        $attachmentsArray[]                 = $attachmentObject;
-                    //}
+                    $attachmentsArray[]                 = $attachmentObject;
 
                 }
 
-                
-                //Log::debug("getAttachments:");
-                // Log::debug(print_r($email->getAttachments(), true));;
-                // Log::debug("Has attachments, storing");
                 $mail->attachments($attachmentsArray);
-                //Log::debug("stored");
+              
             } else {
                         
                 if ($message == "" && $mail->subject() == "") {
@@ -304,44 +269,19 @@ class Download
             die('An error occured: '.$ex->getMessage());
         }
 
-
-        // Log::debug("got mail ids: ".print_r($mail_ids, true));
-
         $numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
                 
-                // Log::debug("fetchEmail: ".$mail_id);
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
                     
-
-                    // Log::debug("got mail");
-                    // Log::debug("DT: ".print_r($mail->headers(), true));
-
-                    // if (isset($mail->headers()["Envelope-to"])) {
-                    //     Log::debug("DT: ".$mail->headers()["Envelope-to"]);
-                    // } else if (isset($mail->headers()["Delivered-To"])) {
-                    //     Log::debug("DT: ".$mail->headers()["Delivered-To"]);
-                    // }
-
-
-
-                    // Log::debug("to: ".$mail->headers()["To"]);
-
-                    // Log::debug("from: ".$mail->headers()["From"]);
-
-                    // Log::debug("subject: ".$mail->headers()["Subject"]);
-
                     $returnPath = "";
                     if (isset($mail->headers()["Return-Path"])) {
                         $returnPath = $mail->headers()["Return-Path"];
                     } else if (isset($mail->headers()["Return-path"])) {
                         $returnPath = $mail->headers()["Return-path"];
                     }
-                    // Log::debug("returnPath: ".$returnPath);
-
-                    // Log::debug(print_r($mail, true));
-
+                    
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
                         $sentTo = $mail->headers()["Envelope-to"];
@@ -355,7 +295,7 @@ class Download
                         "returnPath"    => $returnPath,
                         "fromAddress"   => $mail->fromAddress(),
                         "subject"       => $mail->subject(),
-                        "ip"            => $mail->ips()[0],
+                        "ip"            => $mail->ips()[0]??"",
                         "fromAddress"   => $mail->fromAddress(),
                         "fromName"      => $mail->fromName(),
                         "message"       => $mail->message(),
@@ -379,7 +319,6 @@ class Download
                 }
 
                 if (config("tickets.delete_after_download") == true) {
-                    // Log::debug("delete_after_download is true...");
                     $this->mailbox->deleteMail($mail_id);
                 }
                 
@@ -390,15 +329,10 @@ class Download
 
     public function download()
     {
-
-        // Log::debug("calling fetch...");
         $this->fetch();
 
         $this->mailbox->expungeDeletedMails();
         $this->mailbox->disconnect();
-
-
-        
     }
 
 }
