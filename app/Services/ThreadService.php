@@ -9,6 +9,8 @@ use App\Models\Thread;
 use App\Models\Ticket;
 use App\Models\Attachement;
 
+use Illuminate\Support\Facades\Log;
+
 class ThreadService
 {
 
@@ -30,6 +32,7 @@ class ThreadService
         }
 
 
+        Log::debug("Saving new thread....");
 
         $thread = new Thread();
         $thread->ticket_id = $ticket->id;
@@ -38,8 +41,11 @@ class ThreadService
         
         $thread->save();
 
+        Log::debug("thread id: ".$thread->id." saved");
+
         if ($thread->id) {
 
+            Log::debug("Assigning attachments...");
             // update attachements
             Attachement::where(["random_string" => $randomString])
                 ->update([
@@ -47,12 +53,16 @@ class ThreadService
                     "thread_id" => $thread->id
                 ]);
 
+                Log::debug("Attachements assigned..");
+
         }
 
         if ($skipEmail == false) {
+            Log::debug("Creating job ThreadReplyCreatedEmail");
             ThreadReplyCreatedEmail::dispatch($thread);
         }
-        
+
+        Log:debug("done, returinging");
         return $thread->load("attachement");
 
     }

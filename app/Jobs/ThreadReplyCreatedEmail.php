@@ -12,6 +12,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Mail\ThreadReplyCreated;
 use App\Models\Thread;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
 
 class ThreadReplyCreatedEmail implements ShouldQueue
 {
@@ -30,13 +32,20 @@ class ThreadReplyCreatedEmail implements ShouldQueue
      */
     public function handle(): void
     {
+
+        Log::debug("in ThreadReplyCreatedEmail job");
+        
         $ticket = $this->thread->ticket;
         $user   = $ticket->user;
+        
+        Log::debug("Ticket: ".$ticket->id);
+        Log::debug("User: ".$user->email);
+        
 
         Mail::to($user->email)->send(
             new ThreadReplyCreated($this->thread)
         );
 
-        
+        Log::debug("job done");
     }
 }

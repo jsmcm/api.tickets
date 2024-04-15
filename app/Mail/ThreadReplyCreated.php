@@ -29,6 +29,8 @@ class ThreadReplyCreated extends Mailable
     public function build()
     {
 
+        Log::debug("In ThreadReplyCreated build");
+
         $factory = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory();
 
         $ticket = $this->thread->ticket;
@@ -47,6 +49,8 @@ class ThreadReplyCreated extends Mailable
         ));
         Mail::setSymfonyTransport($transport);
 
+        Log::debug("build done");
+
     }
 
 
@@ -56,9 +60,13 @@ class ThreadReplyCreated extends Mailable
     public function envelope(): Envelope
     {
 
+        Log::debug("In ThreadReplyCreated envelope");
+        
         $ticket     = $this->thread->ticket;
         $department = $ticket->department;
 
+        Log::debug("envelope returning");
+        
         return new Envelope(
             subject: "(#".str_pad(dechex($ticket->id), 5, "0", STR_PAD_LEFT).") New Reply on Ticket",
             from: $department->email_address
@@ -73,6 +81,9 @@ class ThreadReplyCreated extends Mailable
         $ticket = $this->thread->ticket;
         $department = $ticket->department;
 
+
+        Log::debug("content returning");
+        
         return new Content(
             view: 'emails.thread.created',
             text: 'emails.thread.created-text',
@@ -85,6 +96,7 @@ class ThreadReplyCreated extends Mailable
                 "messaged"      => $this->thread->message
             ]
         );
+        
     }
 
     /**
@@ -95,6 +107,8 @@ class ThreadReplyCreated extends Mailable
     public function attachments(): array
     {
 
+        Log::debug("In ThreReplyCreated attachments");
+        
         $threadAttachements = $this->thread->attachement;
 
         $attachments = [];
@@ -113,6 +127,7 @@ class ThreadReplyCreated extends Mailable
                 ->as($fileName);
         }
 
+        Log::debug("returning attachments: ".count($attachments));
         return $attachments;
     }
     
