@@ -12,7 +12,7 @@ use \App\Models\Department;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 use App\Jobs\TicketCreatedEmail;
 
 class TicketService
