@@ -62,7 +62,7 @@ class ThreadService
             ThreadReplyCreatedEmail::dispatch($thread);
         }
 
-        Log:debug("done, returinging");
+        Log::debug("done, returinging");
         return $thread->load("attachement");
 
     }
