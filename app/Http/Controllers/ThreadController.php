@@ -21,7 +21,8 @@ class ThreadController extends Controller
             "type"          => "required|string",
             "message"       => "required|string",
             "randomString"  => "required|string",
-            "skipEmail"     => "boolean"
+            "skipEmail"     => "boolean",
+            "cannedReply"   => "string|nullable",
         ]);
 
 
@@ -34,7 +35,8 @@ class ThreadController extends Controller
                 $validatedData["type"],
                 $validatedData["message"],
                 $validatedData["randomString"],
-                $validatedData["skipEmail"]
+                $validatedData["skipEmail"],
+                $validatedData["cannedReply"] ?? "",
             );
 
         } catch (\Exception $e) {

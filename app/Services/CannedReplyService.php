@@ -52,7 +52,7 @@ class CannedReplyService
         }
  
         $cannedReply->title = $title;
-        $cannedReply->slug = Str::slug($title.Str::random(16));
+        $cannedReply->slug = Str::slug($title).'['.strtolower(Str::random(16)).']';
         $cannedReply->message = $message;
         $cannedReply->use_ml = $useMl;
         $cannedReply->department_id = $departmentId;

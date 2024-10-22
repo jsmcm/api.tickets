@@ -317,6 +317,8 @@ class Download
                         "attachments"   => $mail->attachments()
                     ];
 
+                    Log::debug("saving message: ");
+                    Log::debug(print_r($mail->message(), true));
 
 		    $processMail = true;
 
