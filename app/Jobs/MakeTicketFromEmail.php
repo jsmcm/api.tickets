@@ -100,7 +100,8 @@ class MakeTicketFromEmail implements ShouldQueue
             "from-client",
             $this->mail["message"],
             Str::random(32),
-            true
+            true,
+            ""
         );
 
 

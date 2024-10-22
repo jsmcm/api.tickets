@@ -19,7 +19,8 @@ class ThreadService
         string $type,
         string $message,
         string $randomString,
-        bool $skipEmail
+        bool $skipEmail,
+        string $cannedReply
     )
     {
 
@@ -35,6 +36,7 @@ class ThreadService
         $thread->ticket_id = $ticket->id;
         $thread->type = $type;
         $thread->message = $message;
+        $thread->canned_reply = $cannedReply;
         
         $thread->save();
 
