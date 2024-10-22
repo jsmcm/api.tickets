@@ -260,8 +260,13 @@ class Download
         $mail_ids = null;
 
         try {
-            
-            $mail_ids = $this->mailbox->searchMailbox('ALL');
+
+
+		$seen = "UNSEEN";
+		if (intVal(date("i")) < 2) {
+			// $seen = "ALL";
+		}
+            $mail_ids = $this->mailbox->searchMailbox($seen);
             
         } catch (ConnectionException $ex) {
             die('IMAP connection failed: '.$ex->getMessage());
@@ -281,14 +286,24 @@ class Download
                     } else if (isset($mail->headers()["Return-path"])) {
                         $returnPath = $mail->headers()["Return-path"];
                     }
-                    
+
+
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
                         $sentTo = $mail->headers()["Envelope-to"];
+		    } else if (isset($mail->headers()["To"])) {
+                        $sentTo = $mail->headers()["To"];
                     } else if (isset($mail->headers()["Delivered-To"])) {
                         $sentTo = $mail->headers()["Delivered-To"];
                     }
 
+		    $sentTo = $this->parseEmailAddress($sentTo);
+
+		    //if ($sentTo != $this->username) {
+		    if ($sentTo == "john@pricedrop.co.za") {
+			    Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
+			    return;
+		    }
 
                     $mailArray = [
                         "sentTo"        => $sentTo,
@@ -298,14 +313,30 @@ class Download
                         "ip"            => $mail->ips()[0]??"",
                         "fromAddress"   => $mail->fromAddress(),
                         "fromName"      => $mail->fromName(),
-                        "message"       => $mail->message(),
+			"message"       => $mail->message(),
                         "attachments"   => $mail->attachments()
                     ];
 
 
+		    $processMail = true;
+
+		    if ($mailArray["returnPath"] == "<no-reply@amazonses.com>" && $mailArray["fromAddress"] == "complaints@email-abuse.amazonses.com") {
+			    $mailArray["message"] = substr($mailArray["message"], 0, strpos($mailArray["message"], "\n"));
+		    }
 
                     // Ignore bounces
-                    if ($returnPath != "<>") {
+		    if ($returnPath == "<>") {
+			$processMail = false;
+		    }
+
+
+	            if ($processMail) {
+
+			Log::debug("in app/Services/MailDownloader/Download.php.");
+			Log::debug("userName: ".$this->username);
+			Log::debug("mailArray: ");
+			Log::debug(print_r($mailArray, true));
+
                         $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
                             ->addSeconds(15));
@@ -319,12 +350,27 @@ class Download
                 }
 
                 if (config("tickets.delete_after_download") == true) {
-                    $this->mailbox->deleteMail($mail_id);
+                    // $this->mailbox->deleteMail($mail_id);
                 }
                 
             }
         }
 
+    }
+
+    function parseEmailAddress($To)
+    {
+	    $emailAddress = $To;
+	    $lt = strpos($To, "<");
+	    if ($lt) {
+		    $emailAddress = substr($To, $lt);
+	    }
+
+	    $emailAddress = str_replace("\"", "", $emailAddress);
+	    $emailAddress = str_replace("<", "", $emailAddress);
+	    $emailAddress = str_replace(">", "", $emailAddress);
+
+	   return trim($emailAddress); 
     }
 
     public function download()

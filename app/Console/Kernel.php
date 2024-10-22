@@ -17,8 +17,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
 
         $schedule->job(new DownloadEmails)
-        ->everyMinute()
-        ->onOneServer();
+        ->everyMinute();
 
         //$schedule->job(new DownloadEmails)->everyFiveMinutes();
         //$schedule->job(new DownloadEmails)->everyFifteenMinutes();
