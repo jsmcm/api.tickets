@@ -52,13 +52,17 @@ Route::group([
     Route::post("/attachment", "App\Http\Controllers\AttachementController@store");
 
     Route::post("/thread/{ticket}", "App\Http\Controllers\ThreadController@store");
-    
-    
+    Route::get("/thread/canned-replies", "App\Http\Controllers\ThreadController@index");
+
+
+
+
     Route::get("/canned-replies", "App\Http\Controllers\CannedReplyController@index");
     Route::post("/canned-replies", "App\Http\Controllers\CannedReplyController@store");
     Route::delete("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@destroy");
     Route::patch("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@update");
     Route::get("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@show");
+
 
     /**
      * Merge a ticket
