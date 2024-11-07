@@ -53,6 +53,7 @@ Route::group([
 
     Route::post("/thread/{ticket}", "App\Http\Controllers\ThreadController@store");
     Route::get("/thread/canned-replies", "App\Http\Controllers\ThreadController@index");
+    Route::get("/thread/{thread}", "App\Http\Controllers\ThreadController@show");
 
 
 

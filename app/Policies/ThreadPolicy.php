@@ -25,7 +25,11 @@ class ThreadPolicy
      */
     public function view(User $user, Thread $thread): bool
     {
-        //
+        if ($user->level >= 50) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

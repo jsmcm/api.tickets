@@ -33,6 +33,22 @@ class ThreadController extends Controller
     }
 
 
+
+    public function show(Thread $thread) {
+
+        if (! auth()->user()->can("view", $thread)) {
+            throw new Exception("Not Authorised");
+        }
+
+        $thread->load("ticket", "ticket.department");
+
+        return response()->json(
+            $thread
+        , 200);
+    }
+
+
+
     public function store(Ticket $ticket, Request $request)
     {
 
