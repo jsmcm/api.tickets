@@ -12,7 +12,8 @@ use App\Services\TicketService;
 use Exception;
 use Illuminate\Http\Request;
 use App\Policies\TicketPolicy;
-
+use App\Services\DepartmentService;
+use App\Services\ThreadService;
 use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
@@ -128,7 +129,7 @@ class TicketController extends Controller
 
         $departmentService = new DepartmentService();
 
-        $department = $deparmentService->departmentByEmail($validatedData["departmentEmail"]);
+        $department = $departmentService->departmentByEmail($validatedData["departmentEmail"]);
 
         if ($department == false) {
             return response()->json([
@@ -150,7 +151,7 @@ class TicketController extends Controller
                 $validatedData["firstName"]
             );
 
-            if ($icket) {
+            if ($ticket) {
 
                 $threadService = new ThreadService();
 
@@ -161,7 +162,8 @@ class TicketController extends Controller
                         "from-client",
                         $validatedData["message"],
                         "",
-                        false
+                        false,
+                        ""
                     );
         
                 } catch (\Exception $e) {
