@@ -9,7 +9,9 @@ use App\Models\Thread;
 //use App\Models\Thread;
 use \App\Services\ThreadService;
 use App\Models\Ticket;
+use App\Services\MLService;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class ThreadController extends Controller
 {
@@ -82,7 +84,6 @@ class ThreadController extends Controller
                 ], 500
             );   
         }
-
 
         if ($thread != null) {
             return response()->json(

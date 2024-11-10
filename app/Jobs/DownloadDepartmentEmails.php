@@ -47,7 +47,7 @@ class DownloadDepartmentEmails implements ShouldQueue //, ShouldBeUnique
             \App\Jobs\MakeTicketFromEmail::class, 
             $this->department->mail_host, 
             $this->department->pop_port,
-            "imap"
+            "pop"
         );
 
         $download->download();
