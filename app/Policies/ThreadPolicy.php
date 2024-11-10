@@ -44,8 +44,12 @@ class ThreadPolicy
      * Determine whether the user can update the model.
      */
     public function update(User $user, Thread $thread): bool
-    {
-        //
+    {        
+        if ($user->level >= 50) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
