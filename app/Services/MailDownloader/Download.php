@@ -39,7 +39,8 @@ class Download
         if ($port == 993) {
             $connectionType = "ssl";
         }
-        
+	
+
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
@@ -263,14 +264,14 @@ class Download
 
 		$seen = "UNSEEN";
 		if (intVal(date("i")) < 2) {
-			// $seen = "ALL";
+			$seen = "ALL";
 		}
             $mail_ids = $this->mailbox->searchMailbox($seen);
             
         } catch (ConnectionException $ex) {
-            die('IMAP connection failed: '.$ex->getMessage());
+            throw new \Exception('IMAP connection failed: '.$ex->getMessage());
         } catch (\Exception $ex) {
-            die('An error occured: '.$ex->getMessage());
+            throw new \Exception('An error occured: '.$ex->getMessage());
         }
 
         $numberToGet = 0;
@@ -316,8 +317,6 @@ class Download
                         "attachments"   => $mail->attachments()
                     ];
 
-                    Log::debug("saving message: ");
-                    Log::debug(print_r($mail->message(), true));
 
 		    $processMail = true;
 
@@ -333,11 +332,6 @@ class Download
 
 	            if ($processMail) {
 
-			Log::debug("in app/Services/MailDownloader/Download.php.");
-			Log::debug("userName: ".$this->username);
-			Log::debug("mailArray: ");
-			Log::debug(print_r($mailArray, true));
-
                         $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
                             ->addSeconds(15));
@@ -351,7 +345,7 @@ class Download
                 }
 
                 if (config("tickets.delete_after_download") == true) {
-                    // $this->mailbox->deleteMail($mail_id);
+                    $this->mailbox->deleteMail($mail_id);
                 }
                 
             }
