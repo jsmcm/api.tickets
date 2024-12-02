@@ -8,7 +8,7 @@ use EmailReplyParser\Parser\EmailParser;
 use App\Services\MailDownloader\Mail;
 use PhpImap\Exceptions\ConnectionException;
 use PhpImap\Mailbox;
-
+use App\Models\Ban;
 use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\Storage;
@@ -290,19 +290,19 @@ class Download
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
                         $sentTo = $mail->headers()["Envelope-to"];
-		    } else if (isset($mail->headers()["To"])) {
+		            } else if (isset($mail->headers()["To"])) {
                         $sentTo = $mail->headers()["To"];
                     } else if (isset($mail->headers()["Delivered-To"])) {
                         $sentTo = $mail->headers()["Delivered-To"];
                     }
 
-		    $sentTo = $this->parseEmailAddress($sentTo);
+                    $sentTo = $this->parseEmailAddress($sentTo);
 
-		    //if ($sentTo != $this->username) {
-		    if ($sentTo == "john@pricedrop.co.za") {
-			    Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
-			    return;
-		    }
+                    //if ($sentTo != $this->username) {
+                    if ($sentTo == "john@pricedrop.co.za") {
+                        Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
+                        return;
+                    }
 
                     $mailArray = [
                         "sentTo"        => $sentTo,
@@ -312,31 +312,35 @@ class Download
                         "ip"            => $mail->ips()[0]??"",
                         "fromAddress"   => $mail->fromAddress(),
                         "fromName"      => $mail->fromName(),
-			"message"       => $mail->message(),
+			            "message"       => $mail->message(),
                         "attachments"   => $mail->attachments()
                     ];
 
-                    Log::debug("saving message: ");
-                    Log::debug(print_r($mail->message(), true));
+                    // Log::debug("saving message: ");
+                    // Log::debug(print_r($mail->message(), true));
 
-		    $processMail = true;
+                    $processMail = true;
 
-		    if ($mailArray["returnPath"] == "<no-reply@amazonses.com>" && $mailArray["fromAddress"] == "complaints@email-abuse.amazonses.com") {
-			    $mailArray["message"] = substr($mailArray["message"], 0, strpos($mailArray["message"], "\n"));
-		    }
+                    if ($mailArray["returnPath"] == "<no-reply@amazonses.com>" && $mailArray["fromAddress"] == "complaints@email-abuse.amazonses.com") {
+                        $mailArray["message"] = substr($mailArray["message"], 0, strpos($mailArray["message"], "\n"));
+                    }
 
                     // Ignore bounces
-		    if ($returnPath == "<>") {
-			$processMail = false;
-		    }
+                    if ($returnPath == "<>") {
+                        $processMail = false;
+                    }
 
+                    $ban = Ban::where("email", $sentTo)->first();
+                    if (!empty($ban)) {
+                       $processMail = false; 
+                    }
 
-	            if ($processMail) {
+	                if ($processMail) {
 
-			Log::debug("in app/Services/MailDownloader/Download.php.");
-			Log::debug("userName: ".$this->username);
-			Log::debug("mailArray: ");
-			Log::debug(print_r($mailArray, true));
+                        // Log::debug("in app/Services/MailDownloader/Download.php.");
+                        // Log::debug("userName: ".$this->username);
+                        // Log::debug("mailArray: ");
+                        // Log::debug(print_r($mailArray, true));
 
                         $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
@@ -351,7 +355,7 @@ class Download
                 }
 
                 if (config("tickets.delete_after_download") == true) {
-                    // $this->mailbox->deleteMail($mail_id);
+                    $this->mailbox->deleteMail($mail_id);
                 }
                 
             }
