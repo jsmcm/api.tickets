@@ -40,7 +40,6 @@ class Download
             $connectionType = "ssl";
         }
 	
-
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
@@ -52,6 +51,9 @@ class Download
 
     private function convertGmailToBase($email)
     {
+	    if ($email == "") {
+		    return "";
+	    }
 
         $email = strtolower($email);
 
