@@ -276,7 +276,7 @@ class Download
             throw new \Exception('An error occured: '.$ex->getMessage());
         }
 
-        $numberToGet = 0;
+	$numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
                 
@@ -301,10 +301,10 @@ class Download
 
                     $sentTo = $this->parseEmailAddress($sentTo);
 
-                    //if ($sentTo != $this->username) {
+		    //if ($sentTo != $this->username) {
                     if ($sentTo == "john@pricedrop.co.za") {
                         Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
-                        return;
+                        continue;
                     }
 
                     $mailArray = [
@@ -344,7 +344,7 @@ class Download
                     
 
 
-                    if ($numberToGet++ >= config("tickets.download_per_round")) {
+		    if ($numberToGet++ >= config("tickets.download_per_round")) {
                         break;
                     }
                 }
