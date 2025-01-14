@@ -100,10 +100,15 @@ class Download
         // this is the mail object we'll return
         $mail = new Mail();
 
-        $email = $mailbox->getMail(
-            $mail_id, // ID of the email, you want to get
-            true //false // Do NOT mark emails as seen (optional)
-        );
+	try {
+        	$email = $mailbox->getMail(
+            		$mail_id, // ID of the email, you want to get
+            		true //false // Do NOT mark emails as seen (optional)
+		);
+	} catch (\Exception $e) {
+		Log::debug("exception: ".print_r($e, true));
+		return false;
+	}
 
 
         $header = $mailbox->getMailHeader($mail_id)->headersRaw;
