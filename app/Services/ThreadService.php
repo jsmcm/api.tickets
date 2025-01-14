@@ -8,6 +8,7 @@ use App\Jobs\ThreadReplyCreatedEmail;
 use App\Models\Thread;
 use App\Models\Ticket;
 use App\Models\Attachement;
+use Illuminate\Support\Facades\Log;
 
 // use Illuminate\Support\Facades\Log;
 
@@ -49,6 +50,22 @@ class ThreadService
                     "thread_id" => $thread->id
                 ]);
 
+        }
+
+        Log::debug("Type: ".$type);
+        if ($type == "from-client") {
+            $mlService = new MLService();
+            $intent = $mlService->getIntent($message);
+            Log::debug("mlService get intent: ".$intent);
+
+            $this->store(
+                $ticket,
+                "internal-note",
+                $intent,
+                $randomString,
+                true,
+                ""
+            );
         }
 
         if ($skipEmail == false) {

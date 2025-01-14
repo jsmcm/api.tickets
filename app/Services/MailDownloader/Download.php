@@ -8,7 +8,7 @@ use EmailReplyParser\Parser\EmailParser;
 use App\Services\MailDownloader\Mail;
 use PhpImap\Exceptions\ConnectionException;
 use PhpImap\Mailbox;
-
+use App\Models\Ban;
 use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\Storage;
@@ -39,8 +39,7 @@ class Download
         if ($port == 993) {
             $connectionType = "ssl";
         }
-        
-
+	
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
@@ -52,6 +51,9 @@ class Download
 
     private function convertGmailToBase($email)
     {
+	    if ($email == "") {
+		    return "";
+	    }
 
         $email = strtolower($email);
 
@@ -264,17 +266,17 @@ class Download
 
 		$seen = "UNSEEN";
 		if (intVal(date("i")) < 2) {
-			// $seen = "ALL";
+			$seen = "ALL";
 		}
             $mail_ids = $this->mailbox->searchMailbox($seen);
             
         } catch (ConnectionException $ex) {
-            die('IMAP connection failed: '.$ex->getMessage());
+            throw new \Exception('IMAP connection failed: '.$ex->getMessage());
         } catch (\Exception $ex) {
-            die('An error occured: '.$ex->getMessage());
+            throw new \Exception('An error occured: '.$ex->getMessage());
         }
 
-        $numberToGet = 0;
+	$numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
                 
@@ -291,19 +293,19 @@ class Download
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
                         $sentTo = $mail->headers()["Envelope-to"];
-		    } else if (isset($mail->headers()["To"])) {
+		            } else if (isset($mail->headers()["To"])) {
                         $sentTo = $mail->headers()["To"];
                     } else if (isset($mail->headers()["Delivered-To"])) {
                         $sentTo = $mail->headers()["Delivered-To"];
                     }
 
-		    $sentTo = $this->parseEmailAddress($sentTo);
+                    $sentTo = $this->parseEmailAddress($sentTo);
 
 		    //if ($sentTo != $this->username) {
-		    if ($sentTo == "john@pricedrop.co.za") {
-			    Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
-			    return;
-		    }
+                    if ($sentTo == "john@pricedrop.co.za") {
+                        Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
+                        continue;
+                    }
 
                     $mailArray = [
                         "sentTo"        => $sentTo,
@@ -313,31 +315,27 @@ class Download
                         "ip"            => $mail->ips()[0]??"",
                         "fromAddress"   => $mail->fromAddress(),
                         "fromName"      => $mail->fromName(),
-			"message"       => $mail->message(),
+			            "message"       => $mail->message(),
                         "attachments"   => $mail->attachments()
                     ];
 
-                    Log::debug("saving message: ");
-                    Log::debug(print_r($mail->message(), true));
+                    $processMail = true;
 
-		    $processMail = true;
-
-		    if ($mailArray["returnPath"] == "<no-reply@amazonses.com>" && $mailArray["fromAddress"] == "complaints@email-abuse.amazonses.com") {
-			    $mailArray["message"] = substr($mailArray["message"], 0, strpos($mailArray["message"], "\n"));
-		    }
+                    if ($mailArray["returnPath"] == "<no-reply@amazonses.com>" && $mailArray["fromAddress"] == "complaints@email-abuse.amazonses.com") {
+                        $mailArray["message"] = substr($mailArray["message"], 0, strpos($mailArray["message"], "\n"));
+                    }
 
                     // Ignore bounces
-		    if ($returnPath == "<>") {
-			$processMail = false;
-		    }
+                    if ($returnPath == "<>") {
+                        $processMail = false;
+                    }
 
+                    $ban = Ban::where("email", $sentTo)->first();
+                    if (!empty($ban)) {
+                       $processMail = false; 
+                    }
 
-	            if ($processMail) {
-
-			Log::debug("in app/Services/MailDownloader/Download.php.");
-			Log::debug("userName: ".$this->username);
-			Log::debug("mailArray: ");
-			Log::debug(print_r($mailArray, true));
+	                if ($processMail) {
 
                         $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
@@ -346,13 +344,13 @@ class Download
                     
 
 
-                    if ($numberToGet++ >= config("tickets.download_per_round")) {
+		    if ($numberToGet++ >= config("tickets.download_per_round")) {
                         break;
                     }
                 }
 
                 if (config("tickets.delete_after_download") == true) {
-                    // $this->mailbox->deleteMail($mail_id);
+                    $this->mailbox->deleteMail($mail_id);
                 }
                 
             }

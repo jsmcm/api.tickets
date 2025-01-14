@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Ban;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Department;
 use App\Models\Ticket;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 class TicketController extends Controller
 {
     //
-    public function destroy(Ticket $ticket)
+    public function destroy(Ticket $ticket, Request $request)
     {
 
         try {
@@ -30,6 +31,17 @@ class TicketController extends Controller
                     "status" => "error",
                     "message" => $e->getMessage()
                 ], 500);
+        }
+
+        
+        if ($request->ban == "true") {
+            $banObject = Ban::where("email", $ticket->user->email)->first();
+
+            if (empty($banObject)) {
+                $banObject = new Ban();
+                $banObject->email = $ticket->user->email;
+                $banObject->save();
+            }
         }
 
         return response()->json(
