@@ -9,7 +9,6 @@ use App\Services\MailDownloader\Mail;
 use PhpImap\Exceptions\ConnectionException;
 use PhpImap\Mailbox;
 use App\Models\Ban;
-use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -308,7 +307,6 @@ class Download
 
 		    //if ($sentTo != $this->username) {
                     if ($sentTo == "john@pricedrop.co.za") {
-                        Log::debug("this was sent to ".$sentTo." but we are ".$this->username.", skipping");
                         continue;
                     }
 

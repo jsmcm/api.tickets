@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 use App\Services\DepartmentService;
 use App\Models\Department;
-use Illuminate\Support\Facades\Log;
 
 class DepartmentController extends Controller
 {
@@ -96,8 +95,6 @@ class DepartmentController extends Controller
 
     public function index(Request $request)
     {
-        // Log::write("debug", auth()->user()->level);
-
         $departments = null;
         
         if (auth()->user()->level < 50) {
@@ -140,15 +137,9 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
-        // Log::write("debug", auth()->user()->level);
-
- 
         if (auth()->user()->level < 50) {
-            
             return response()->json(["Not Authorized", 500]);
-
         } 
-
         
         $department->makeVisible([
             'mail_host',

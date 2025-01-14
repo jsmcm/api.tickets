@@ -15,7 +15,6 @@ use Illuminate\Http\Request;
 use App\Policies\TicketPolicy;
 use App\Services\DepartmentService;
 use App\Services\ThreadService;
-use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {

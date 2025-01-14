@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use \App\Services\AttachementService;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 
 class AttachementController extends Controller

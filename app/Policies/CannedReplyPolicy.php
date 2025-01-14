@@ -6,7 +6,6 @@ use App\Models\CannedReply;
 use App\Models\User;
 use App\Models\Department;
 use Illuminate\Auth\Access\Response;
-// use Illuminate\Support\Facades\Log;
 
 class CannedReplyPolicy
 {
@@ -15,7 +14,7 @@ class CannedReplyPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -87,7 +86,7 @@ class CannedReplyPolicy
      */
     public function restore(User $user, CannedReply $cannedReply): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -95,6 +94,6 @@ class CannedReplyPolicy
      */
     public function forceDelete(User $user, CannedReply $cannedReply): bool
     {
-        //
+        return false;
     }
 }

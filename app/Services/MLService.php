@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
+use Exception;
 
 class MLService
 {
@@ -22,6 +22,7 @@ class MLService
 
     function getIntent(string $utterance)
     {
+
         if (config("openai.apiKey") == "") {
             return false;
         }
@@ -61,6 +62,10 @@ class MLService
         curl_close($c);
 
         $json = json_decode($resultString);
+
+        if (isset($json->error)) {
+            throw new Exception($json->error->message);
+        }
 
 	    return $json->choices[0]->message->content;         
 

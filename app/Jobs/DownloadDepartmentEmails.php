@@ -12,7 +12,6 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Services\MailDownloader\Download;
 
-use Illuminate\Support\Facades\Log;
 
 class DownloadDepartmentEmails implements ShouldQueue //, ShouldBeUnique
 {

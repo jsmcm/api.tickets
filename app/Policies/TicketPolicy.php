@@ -6,8 +6,6 @@ use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-use Illuminate\Support\Facades\Log;
-
 class TicketPolicy
 {
     /**
@@ -15,7 +13,7 @@ class TicketPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return false;
     }
 
     public function viewInternalNotes(User $user): bool
@@ -50,7 +48,7 @@ class TicketPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -58,7 +56,7 @@ class TicketPolicy
      */
     public function update(User $user, Ticket $ticket): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -66,7 +64,7 @@ class TicketPolicy
      */
     public function delete(User $user, Ticket $ticket): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -74,7 +72,7 @@ class TicketPolicy
      */
     public function restore(User $user, Ticket $ticket): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -82,6 +80,6 @@ class TicketPolicy
      */
     public function forceDelete(User $user, Ticket $ticket): bool
     {
-        //
+        return false;
     }
 }
