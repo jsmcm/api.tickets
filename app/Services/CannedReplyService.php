@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Models\Department;
 use App\Models\CannedReply;
 
-//use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Type\Integer;
 use Illuminate\Support\Str;
 

@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CannedReply;
 use App\Services\CannedReplyService;
 use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Log;
-// use Illuminate\Support\Facades\Auth;
-
 
 class CannedReplyController extends Controller
 {

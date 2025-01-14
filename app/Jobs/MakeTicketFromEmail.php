@@ -10,7 +10,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Services\TicketService;
-use Illuminate\Support\Facades\Log;
 
 use App\Services\ThreadService;
 use App\Models\Department;
@@ -65,7 +64,6 @@ class MakeTicketFromEmail implements ShouldQueue
             if ($ticket !== null) {
 
                 if ($this->mail["fromAddress"] != $ticket->user->email) {
-                    // Log::debug("ticket does not belong to this email....");
                     DifferentEmailAddressEmail::dispatch($ticket->department, $this->mail["fromAddress"], $this->mail["subject"], $ticket->id);
                     return;
                     //throw new \Exception("Email received for ticket from different email address. Expected from: ".$ticket->user->email." but received from: ".$this->mail->fromAddress());

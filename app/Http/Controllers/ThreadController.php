@@ -11,7 +11,6 @@ use \App\Services\ThreadService;
 use App\Models\Ticket;
 use App\Services\MLService;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 class ThreadController extends Controller
 {

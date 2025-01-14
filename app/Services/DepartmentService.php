@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\Department;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class DepartmentService
@@ -50,21 +49,6 @@ class DepartmentService
             throw new \Exception("Not authorize", 401);
         }
 
-
-	/*	
-	Log::debug("dpeartment in services: ".$department->department
-		."\r\nlogo: ".$logoUrl
-		."\r\nsig: ".$signature
-		."\r\nmail_host: ".$mailHost
-		."\r\npop_port: ".$popPort
-		."\r\nsmttp: ".$smtpPort
-		."\r\nmailUser: ".$mailUsername
-		."\r\npass: ".$mailPassword
-		."\r\nemail: ".$departmentEmail
-		."\r\napiurl: ".$apiBaseUrl
-		."\r\ntoken: ".$apiToken
-	);
-	*/
 
         $department->department     = $departmentTitle;
         $department->logo_url       = $logoUrl;

@@ -14,7 +14,7 @@ class DepartmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -22,7 +22,7 @@ class DepartmentPolicy
      */
     public function view(User $user, Department $department): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -30,8 +30,7 @@ class DepartmentPolicy
      */
     public function create(User $user): bool
     {
-        //
-        Log::debug("also on dept");
+        return false;
     }
 
     /**
@@ -69,7 +68,7 @@ class DepartmentPolicy
      */
     public function restore(User $user, Department $department): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -77,6 +76,6 @@ class DepartmentPolicy
      */
     public function forceDelete(User $user, Department $department): bool
     {
-        //
+        return false;
     }
 }

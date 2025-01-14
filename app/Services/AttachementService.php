@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use \App\Models\Attachement;
 use Illuminate\Mail\Mailables\Attachment;
 

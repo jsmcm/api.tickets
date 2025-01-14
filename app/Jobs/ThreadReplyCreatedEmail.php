@@ -12,7 +12,6 @@ use Illuminate\Queue\SerializesModels;
 use App\Mail\ThreadReplyCreated;
 use App\Models\Thread;
 use Illuminate\Support\Facades\Mail;
-// use Illuminate\Support\Facades\Log;
 
 
 class ThreadReplyCreatedEmail implements ShouldQueue

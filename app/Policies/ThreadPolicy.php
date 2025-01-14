@@ -37,7 +37,7 @@ class ThreadPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -57,7 +57,7 @@ class ThreadPolicy
      */
     public function delete(User $user, Thread $thread): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -65,7 +65,7 @@ class ThreadPolicy
      */
     public function restore(User $user, Thread $thread): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -73,6 +73,6 @@ class ThreadPolicy
      */
     public function forceDelete(User $user, Thread $thread): bool
     {
-        //
+        return false;
     }
 }
