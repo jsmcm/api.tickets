@@ -20,7 +20,7 @@ class ThreadService
         string $randomString,
         bool $skipEmail,
         string $cannedReply
-    )
+    ): Thread
     {
 
         if ($type == "") {

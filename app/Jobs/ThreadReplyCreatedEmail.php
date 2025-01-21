@@ -21,7 +21,7 @@ class ThreadReplyCreatedEmail implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private Thread $thread)
+    public function __construct(public Thread $thread)
     {
         //
     }
