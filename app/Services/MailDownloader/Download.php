@@ -48,6 +48,50 @@ class Download
     }
 
 
+    private function removeReply($message)
+    {
+        $body = strpos($message, "<body");
+        if ($body) {
+            $bodyEnd = strpos($message, ">", $body);
+            $message = substr($message, $bodyEnd + 1);
+        }
+
+        $quoteStart = strpos($message, "<div class=\"moz-cite-prefix\">");
+        if ($quoteStart) {
+            $message = substr($message, 0, $quoteStart);
+        }
+
+        $quoteStart = strpos($message, "<div class=\"gmail_quote gmail_quote_container\">");
+        if ($quoteStart) {
+            $message = substr($message, 0, $quoteStart);
+        }
+
+        $quoteStart = strpos($message, "<div class=\"gmail_quote\"");
+        if ($quoteStart) {
+            $quoteEnd = strpos($message, ">", $quoteStart);
+            $message = substr($message, 0, $quoteEnd);
+        }
+
+
+        $pattern = '/On \d{4}\/\d{2}\/\d{2} \d{2}:\d{2}, [A-Za-z]+ [A-Za-z]+ wrote:/';
+        if (preg_match($pattern, $message, $matches, PREG_OFFSET_CAPTURE)) {
+            $message = substr($message, 0, intVal($matches[0][1]));
+        }
+
+        $message = strip_tags($message);
+
+        $pattern = '/Get \w+ for \w+/';
+        if (preg_match($pattern, $message, $matches, PREG_OFFSET_CAPTURE)) {
+            $message = substr($message, 0, intVal($matches[0][1]));
+        }
+
+
+        return trim($message);
+    }
+
+
+
+
     private function convertGmailToBase($email)
     {
 	    if ($email == "") {
@@ -99,16 +143,15 @@ class Download
         // this is the mail object we'll return
         $mail = new Mail();
 
-	try {
+	    try {
         	$email = $mailbox->getMail(
-            		$mail_id, // ID of the email, you want to get
-            		true //false // Do NOT mark emails as seen (optional)
-		);
-	} catch (\Exception $e) {
-		Log::debug("exception: ".print_r($e, true));
-		return false;
-	}
-
+                $mail_id, // ID of the email, you want to get
+                true //false // Do NOT mark emails as seen (optional)
+		    );
+        } catch (\Exception $e) {
+            Log::debug("exception: ".print_r($e, true));
+            return false;
+        }
 
         $header = $mailbox->getMailHeader($mail_id)->headersRaw;
 
@@ -178,7 +221,22 @@ class Download
         $message = "";
 
         foreach($fragments as $fragment) {
-            $message .= $fragment->getContent();
+
+            $messagePart = $fragment->getContent();
+
+            Log::debug("-------------------------------------------------");
+            Log::debug("PRE STRIP FRAGMENT: ");
+            Log::debug(print_r($messagePart, true));
+            Log::debug("=================================================");
+            
+            $messagePart = $this->removeReply($messagePart);
+
+            Log::debug("-------------------------------------------------");
+            Log::debug("POST STRIP FRAGMENT: ");
+            Log::debug(print_r($messagePart, true));
+            Log::debug("=================================================");
+            
+            $message .= $messagePart;
         }
 
         $mail->message($message);
@@ -254,12 +312,6 @@ class Download
     }
 
 
-
-
-
-
-
-
     private function fetch()
     {
     
@@ -280,7 +332,7 @@ class Download
             throw new \Exception('An error occured: '.$ex->getMessage());
         }
 
-	$numberToGet = 0;
+	    $numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
                 
@@ -305,7 +357,7 @@ class Download
 
                     $sentTo = $this->parseEmailAddress($sentTo);
 
-		    //if ($sentTo != $this->username) {
+		            //if ($sentTo != $this->username) {
                     if ($sentTo == "john@pricedrop.co.za") {
                         continue;
                     }
