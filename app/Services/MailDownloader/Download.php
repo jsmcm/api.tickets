@@ -9,7 +9,7 @@ use App\Services\MailDownloader\Mail;
 use PhpImap\Exceptions\ConnectionException;
 use PhpImap\Mailbox;
 use App\Models\Ban;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -333,21 +333,18 @@ class Download
                         $processMail = false;
                     }
 
-                    $ban = Ban::where("email", $sentTo)->first();
+                    $ban = Ban::where("email", $mailArray["fromAddress"])->first();
                     if (!empty($ban)) {
-                       $processMail = false; 
+                        $processMail = false; 
                     }
 
 	                if ($processMail) {
-
                         $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
                             ->addSeconds(15));
                     }
-                    
 
-
-		    if ($numberToGet++ >= config("tickets.download_per_round")) {
+		            if ($numberToGet++ >= config("tickets.download_per_round")) {
                         break;
                     }
                 }

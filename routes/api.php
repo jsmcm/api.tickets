@@ -68,6 +68,9 @@ Route::group([
     Route::get("/canned-replies/{cannedReply}", "App\Http\Controllers\CannedReplyController@show");
 
 
+    Route::get("/bans", "App\Http\Controllers\BanController@index");
+    Route::delete("/bans/{ban}", "App\Http\Controllers\BanController@destroy");
+
     /**
      * Merge a ticket
      */

@@ -69,7 +69,6 @@ class CannedReplyService
             throw new \Exception("Not authorize", 401);
         }
 
-
         $cannedReply->message   = $message;
         $cannedReply->use_ml    = $useMl;
         $cannedReply->title     = $title;
