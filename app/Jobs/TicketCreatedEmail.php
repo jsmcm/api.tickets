@@ -20,7 +20,7 @@ class TicketCreatedEmail implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private Department $department, private string $email, private string $subject, private int $ticketId)
+    public function __construct(public Department $department, public string $email, public string $subject, public int $ticketId)
     {
         //
     }

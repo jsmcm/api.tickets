@@ -138,7 +138,7 @@ class TicketService
     )
     {
         
-        if ($departmentId == 0) {
+        if ($departmentId <= 0) {
             throw new \Exception("Department Id not set", 1600001);
         }
         
@@ -186,26 +186,26 @@ class TicketService
     }
 
 
-    public function merge(Ticket $gainingTicket, Ticket $lostingTicket)
+    public function merge(Ticket $gainingTicket, Ticket $losingTicket)
     {
 
-        if ($gainingTicket->user_id != $lostingTicket->user_id) {
+        if ($gainingTicket->user_id != $losingTicket->user_id) {
             throw new \Exception("Merge ticket does not belong to merging ticket user");
         }
 
-        if ($lostingTicket->deleted_at != null) {
+        if ($losingTicket->deleted_at != null) {
             throw new \Exception("Merging ticket deleted (possibly already merged)");
         }
 
 
-        $gainingTicket->subject     = $gainingTicket->subject." (".$lostingTicket->subject.")";
-        $lostingTicket->deleted_at  = date("Y-m-d H:i:s");
-        $lostingTicket->subject     = $lostingTicket->subject." (merged with ".$gainingTicket->id.")";
+        $gainingTicket->subject     = $gainingTicket->subject." (".$losingTicket->subject.")";
+        $losingTicket->deleted_at  = date("Y-m-d H:i:s");
+        $losingTicket->subject     = $losingTicket->subject." (merged with ".$gainingTicket->id.")";
 
         $gainingTicket->save();
-        $lostingTicket->save();
+        $losingTicket->save();
 
-        $threads = $lostingTicket->thread;
+        $threads = $losingTicket->thread;
 
         foreach ($threads as $thread) {
             $thread->ticket_id = $gainingTicket->id;
