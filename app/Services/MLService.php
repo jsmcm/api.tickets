@@ -42,6 +42,10 @@ class MLService
 			"model"         => config("openai.model"),
             "messages" => [
                 [
+                    "role"      => "system",
+                    "content"   => "You are a text classifier for a help desk. You will receive text from a user and you must return the text classification. The only valid classifications are delete,edit-entry,eliminated,flash,how-to-enter,how-to-vote,missing-sms,passwordless-login,position,power,running-dates,social,thank,user,verify-contacts,voting-report,winner,null. You may not make up and other classifications. If you are not highly confident in your classification, you must return the word 'null'. Err on the side of null if there is any doubt."
+                ], 
+                [
                     "role"      => "user",
                     "content"   => $utterance
                 ]
