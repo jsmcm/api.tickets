@@ -165,9 +165,10 @@ class ThreadServiceTest extends TestCase
 
 
         
-    public function test_reply_email_not_dispatched(): void
+    public function test_reply_email_not_dispatched_when_skip_email_flag_is_true(): void
     {
 
+        define("SKIP_EMAIL", true);
         $randomSubject = "TEST SUBJECT - ".date("Ymd_His")." - ".mt_rand(10000, 99999);
         $randomMessage = "This is a message".date("Ymd_His")." - ".mt_rand(10000, 99999);
 
@@ -192,7 +193,7 @@ class ThreadServiceTest extends TestCase
             "from-client",
             $randomMessage,
             $random,
-            true,
+            SKIP_EMAIL,
             ""
         );
 
