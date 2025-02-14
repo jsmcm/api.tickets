@@ -28,14 +28,15 @@ class DepartmentController extends Controller
             "popPort"           => "required|integer",
             "smtpPort"          => "required|integer",
             "apiBaseUrl"        => "nullable|string",
-            "apiToken"          => "nullable|string"
+            "apiToken"          => "nullable|string",
+            "deleteAfterFetch"  => "nullable|boolean"
         ]);
 
 
         $departmentService = new DepartmentService();
 
         try {
-            
+
             $departmentService->update(
                 $department,
                 $validatedData["departmentEmail"],
@@ -48,20 +49,21 @@ class DepartmentController extends Controller
                 $validatedData["popPort"],
                 $validatedData["smtpPort"],
                 $validatedData["apiBaseUrl"]??"",
-                $validatedData["apiToken"]??""
+                $validatedData["apiToken"]??"",
+                $validatedData["deleteAfterFetch"]??true
             );
 
         } catch (\Exception $e) {
             return response()->json(
                 [
-                    "status"    => "error", 
+                    "status"    => "error",
                     "message"   => $e->getMessage()
                 ], (($e->getCode() > 99 && $e->getCode() < 600)?$e->getCode():500)
             );
         }
 
         return response()->json(["data" => "updated"], 200);
-    
+
     }
 
 
@@ -70,7 +72,7 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department)
     {
-        
+
         if (!auth()->user()->can("delete", $department)) {
             return response()->json([
                 "Not authorized"
@@ -82,21 +84,21 @@ class DepartmentController extends Controller
         } catch (\Exception $e) {
             return response()->json(
                 [
-                    "status"    => "error", 
+                    "status"    => "error",
                     "message"   => $e->getMessage()
                 ], 422
             );
         }
 
         return response()->json(["data" => "deleted"], 200);
-    
+
     }
 
 
     public function index(Request $request)
     {
         $departments = null;
-        
+
         if (auth()->user()->level < 50) {
             $departments = Department::where([
                     "user_id" => auth()->user()->id
@@ -133,14 +135,14 @@ class DepartmentController extends Controller
         , 200);
 
     }
-    
+
 
     public function show(Department $department)
     {
         if (auth()->user()->level < 50) {
             return response()->json(["Not Authorized", 500]);
-        } 
-        
+        }
+
         $department->makeVisible([
             'mail_host',
             'pop_port',
@@ -149,8 +151,8 @@ class DepartmentController extends Controller
             'mail_password',
             'email_address',
         ]);
-    
-        
+
+
         return response()->json(
             [
                 "status"        => "success",
@@ -159,6 +161,6 @@ class DepartmentController extends Controller
         , 200);
 
     }
-    
+
 
 }

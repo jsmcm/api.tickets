@@ -11,10 +11,10 @@ use Illuminate\Support\Str;
 class DepartmentService
 {
 
-    
+
     public function departmentByEmail(string $email)
     {
-        
+
         $department = Department::where([
             "email_address" => $email
         ])->first();
@@ -40,8 +40,8 @@ class DepartmentService
         int $popPort,
         int $smtpPort,
         string $apiBaseUrl,
-        string $apiToken
-
+        string $apiToken,
+        string $deleteAfterFetch
     )
     {
 
@@ -50,17 +50,18 @@ class DepartmentService
         }
 
 
-        $department->department     = $departmentTitle;
-        $department->logo_url       = $logoUrl;
-        $department->signature      = $signature;
-        $department->mail_host      = $mailHost;
-        $department->pop_port       = $popPort;
-        $department->smtp_port      = $smtpPort;
-        $department->mail_username  = $mailUsername;
-        $department->mail_password  = $mailPassword;
-        $department->email_address  = $departmentEmail;
-        $department->api_base_url   = $apiBaseUrl;
-        $department->api_token      = $apiToken;
+        $department->department         = $departmentTitle;
+        $department->logo_url           = $logoUrl;
+        $department->signature          = $signature;
+        $department->mail_host          = $mailHost;
+        $department->pop_port           = $popPort;
+        $department->smtp_port          = $smtpPort;
+        $department->mail_username      = $mailUsername;
+        $department->mail_password      = $mailPassword;
+        $department->email_address      = $departmentEmail;
+        $department->api_base_url       = $apiBaseUrl;
+        $department->api_token          = $apiToken;
+        $department->delete_after_fetch = $deleteAfterFetch;
 
         $department->save();
 

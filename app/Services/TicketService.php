@@ -20,7 +20,7 @@ class TicketService
 
     public function search(string $searchTerm)
     {
-       
+
         // https://github.com/spatie/laravel-permission/issues/547
         // // do like this sometime
         // $role = "admin";
@@ -31,7 +31,7 @@ class TicketService
         // })->paginate(10)
 
         $user = auth()->user();
-        
+
         $returnValue = null;
 
         $tickets = Ticket::search(filter_var($searchTerm, FILTER_UNSAFE_RAW))
@@ -46,13 +46,13 @@ class TicketService
             // Ticket::with("user")->with("department")->withCount("attachement")->with("thread")->get()->pull(1);
 
 
-   
+
         $merged = $tickets->merge($threadTickets)
             ->unique()
             ->sort();
-        
+
         $merged->load("user")->load("department")->loadCount("attachement")->load("thread");
-        
+
         if ($user->level > 49) {
             // admins, can see all
             $returnValue = $merged;
@@ -63,19 +63,19 @@ class TicketService
             ])
             ->pluck("id");
 
-            $returnValue = $merged->filter( function ($value, $key) use ($departments) { 
+            $returnValue = $merged->filter( function ($value, $key) use ($departments) {
                 return $departments->id == $value->department_id;
-            });    
+            });
 
         } else if ($user->level < 10) {
             // end user
-            $returnValue = $merged->filter( function ($value, $key) use ($user) { 
+            $returnValue = $merged->filter( function ($value, $key) use ($user) {
                 return $user->id == $value->user_id;
             });
         }
 
         return $returnValue;
-        
+
     }
 
 
@@ -88,16 +88,16 @@ class TicketService
 
     public function userSearch(string $searchTerm)
     {
-       
+
         $user = auth()->user();
-        
+
         // end users cannot search by email, they can
         // only view their own tickets;
         if ($user->level < 10) {
             return null;
         }
 
-   
+
         $userIds = User::where("email", "LIKE", "%".$searchTerm."%")
             ->orWhere("name", "LIKE", "%".$searchTerm."%")
             ->pluck("id");
@@ -112,7 +112,7 @@ class TicketService
             ])
             ->pluck("id");
 
-            $tickets->whereIn("department_id", $departments);  
+            $tickets->whereIn("department_id", $departments);
         }
 
         $tickets->with("user")
@@ -121,7 +121,7 @@ class TicketService
             ->with("thread");
 
         return $tickets->get();
-        
+
     }
 
 
@@ -137,11 +137,11 @@ class TicketService
         string $firstName
     )
     {
-        
+
         if ($departmentId <= 0) {
             throw new \Exception("Department Id not set", 1600001);
         }
-        
+
         if ($email == "") {
             throw new \Exception("Email not set", 1600002);
         }
@@ -150,8 +150,8 @@ class TicketService
             $priority = "normal";
         }
 
-    
-    
+
+
         $user = User::where([
             "email" => $email
         ])->first();
@@ -165,9 +165,9 @@ class TicketService
 
             $user->save();
         }
-    
 
-        
+
+
         $ticket = new Ticket();
 
         $ticket->department_id  = $departmentId;
@@ -199,8 +199,8 @@ class TicketService
 
 
         $gainingTicket->subject     = $gainingTicket->subject." (".$losingTicket->subject.")";
-        $losingTicket->deleted_at  = date("Y-m-d H:i:s");
-        $losingTicket->subject     = $losingTicket->subject." (merged with ".$gainingTicket->id.")";
+        $losingTicket->deleted_at   = date("Y-m-d H:i:s");
+        $losingTicket->subject      = $losingTicket->subject." (merged with ".$gainingTicket->id.")";
 
         $gainingTicket->save();
         $losingTicket->save();
@@ -215,7 +215,7 @@ class TicketService
         return true;
 
     }
-    
-    
+
+
 
 }
