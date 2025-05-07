@@ -11,6 +11,12 @@ class CannedReply extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected function casts(): array
+    {
+        return [
+            "use_ml" => "boolean"
+        ];
+    }
 
     public function department()
     {

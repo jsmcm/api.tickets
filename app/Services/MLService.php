@@ -39,7 +39,7 @@ class MLService
         $headers[] = "Content-Type: application/json";
 
 		$data = array(
-			"model"         => config("openai.model"),
+			"model"    => config("openai.model"),
             "messages" => [
                 [
                     "role"      => "system",

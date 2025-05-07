@@ -14,7 +14,6 @@ class CannedReplyService
 {
     public function index()
     {
-
         $user = auth()->user();
 
         if ($user->level < 10) {
@@ -32,13 +31,14 @@ class CannedReplyService
             $cannedReplies = CannedReply::with("department")->get();
         }
 
-
-
         return $cannedReplies;
     }
 
-
-
+    public function find(Department $department, string $mlSlug) {
+        return CannedReply::where("department_id", $department->id)
+            ->where("slug", "LIKE", $mlSlug."[%")
+            ->first();
+    }
 
     public function store(String $message, String $title, bool $useMl, int $departmentId)
     {

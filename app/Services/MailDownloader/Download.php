@@ -24,11 +24,13 @@ class Download
         private $callbackJob,
         private string $host,
         private int $port=143,
+<<<<<<< HEAD
 	private string $protocol="imap",
 	private bool $deleteAfterFetch=true
+=======
+>>>>>>> 95d8f5477010df76e157e6817e077d400676ff5c
         )
     {
-
 
         set_time_limit(300);
         imap_timeout(IMAP_OPENTIMEOUT, 300); // Set open timeout to 300 seconds
@@ -36,16 +38,34 @@ class Download
 
 
         $connectionType = "notls";
-        if ($port == 993) {
+        if ($port >= 993) {
             $connectionType = "ssl";
         }
+
+        $protocol = "pop";
+        if ($port == 143 || $port == 993) {
+            $protocol = "imap";
+        }
 	
+<<<<<<< HEAD
      	Log::debug("getting dept emails - ".$username);	
+=======
+        // Log::debug("host: ".$host);
+        // Log::debug("port: ".$port);
+        // Log::debug("protocol: ".$protocol);
+        // Log::debug("connectionType: ".$connectionType);
+        // Log::debug("username: ".$username);
+        // Log::debug("password: ".$password);
+
+>>>>>>> 95d8f5477010df76e157e6817e077d400676ff5c
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
             $password // Password for the before configured username
         );
+
+//         imap_errors();
+// imap_alerts();
 
     }
 
@@ -202,7 +222,6 @@ class Download
         $mail->subject((string) $email->subject);    
         $mail->messageId((string) $email->messageId);
 
-
         $mail->textPlain($email->textPlain);
 
         $emailParser = new EmailParser();
@@ -216,9 +235,7 @@ class Download
             $emailFragments = $emailParser->parse($email->textPlain);
         }
 
-        
-        $fragments = $emailFragments->getFragments();
-	    
+        $fragments = $emailFragments->getFragments();	    
 
         $message = "";
 
@@ -242,7 +259,6 @@ class Download
         }
 
         $mail->message($message);
-        
 
         if (!$mailbox->getAttachmentsIgnore()) {  
 
@@ -316,7 +332,6 @@ class Download
 
     private function fetch()
     {
-    
         $mail_ids = null;
 	Log::debug("in fetch");
 
@@ -352,7 +367,6 @@ class Download
                     } else if (isset($mail->headers()["Return-path"])) {
                         $returnPath = $mail->headers()["Return-path"];
                     }
-
 
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
