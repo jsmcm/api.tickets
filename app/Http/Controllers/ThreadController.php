@@ -14,8 +14,6 @@ use Exception;
 
 class ThreadController extends Controller
 {
-
-
     public function index(Request $request) {
 
         $showAll = false;
@@ -56,8 +54,6 @@ class ThreadController extends Controller
 
     }
 
-
-
     public function update(Request $request, Thread $thread) {
 
         if (! auth()->user()->can("update", $thread)) {
@@ -72,7 +68,6 @@ class ThreadController extends Controller
         $thread->canned_reply   = $validatedData["cannedReply"];
         $thread->message        = $validatedData["message"];
         $thread->save();
-
     }
 
 
@@ -101,7 +96,6 @@ class ThreadController extends Controller
             "skipEmail"     => "boolean",
             "cannedReply"   => "string|nullable",
         ]);
-
 
         $threadService = new ThreadService();
 

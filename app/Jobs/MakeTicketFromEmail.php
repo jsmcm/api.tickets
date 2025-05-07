@@ -92,20 +92,17 @@ class MakeTicketFromEmail implements ShouldQueue
 
 
         $threadService = new ThreadService();
-
         $thread = $threadService->store(
             $ticket,
             "from-client",
             $this->mail["message"],
             Str::random(32),
             true,
-            ""
+            "",
+            $isNewTicket,
         );
 
-
-
         $attachments = $this->mail["attachments"];
-
         if (!empty($attachments)) {
             
             foreach ($attachments as $attachment) {
@@ -120,7 +117,6 @@ class MakeTicketFromEmail implements ShouldQueue
                 $attachmentModel->save();
             }
         }
-
 
     }
 
