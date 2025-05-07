@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Services\DepartmentService;
 use App\Models\Department;
+use Illuminate\Support\Facades\Log;
 
 class DepartmentController extends Controller
 {
@@ -32,7 +33,6 @@ class DepartmentController extends Controller
             "deleteAfterFetch"  => "nullable|boolean"
         ]);
 
-
         $departmentService = new DepartmentService();
 
         try {
@@ -50,7 +50,7 @@ class DepartmentController extends Controller
                 $validatedData["smtpPort"],
                 $validatedData["apiBaseUrl"]??"",
                 $validatedData["apiToken"]??"",
-                $validatedData["deleteAfterFetch"]??true
+                $validatedData["deleteAfterFetch"]??false
             );
 
         } catch (\Exception $e) {

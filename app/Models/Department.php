@@ -14,6 +14,10 @@ class Department extends Model
 
     use SoftDeletes; // use the trait
 
+    protected $casts = [
+    	"delete_after_fetch" => "boolean",
+    ];
+
     protected $hidden = [
         'mail_host',
         'pop_port',

@@ -41,7 +41,7 @@ class DepartmentService
         int $smtpPort,
         string $apiBaseUrl,
         string $apiToken,
-        string $deleteAfterFetch
+        bool $deleteAfterFetch
     )
     {
 

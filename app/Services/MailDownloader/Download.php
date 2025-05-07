@@ -24,7 +24,8 @@ class Download
         private $callbackJob,
         private string $host,
         private int $port=143,
-        private string $protocol="imap"
+	private string $protocol="imap",
+	private bool $deleteAfterFetch=true
         )
     {
 
@@ -39,6 +40,7 @@ class Download
             $connectionType = "ssl";
         }
 	
+     	Log::debug("getting dept emails - ".$username);	
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
@@ -149,7 +151,7 @@ class Download
                 true //false // Do NOT mark emails as seen (optional)
 		    );
         } catch (\Exception $e) {
-            Log::debug("exception: ".print_r($e, true));
+            Log::debug("exception: ".$e->getMessage());
             return false;
         }
 
@@ -316,28 +318,34 @@ class Download
     {
     
         $mail_ids = null;
+	Log::debug("in fetch");
 
         try {
 
 
 		$seen = "UNSEEN";
-		if (intVal(date("i")) < 2) {
+		if ($this->deleteAfterFetch) {
 			$seen = "ALL";
 		}
-            $mail_ids = $this->mailbox->searchMailbox($seen);
-            
-        } catch (ConnectionException $ex) {
+
+		$mail_ids = $this->mailbox->searchMailbox($seen);
+	} catch (ConnectionException $ex) {
+            Log::error($e->getMessage());
             throw new \Exception('IMAP connection failed: '.$ex->getMessage());
         } catch (\Exception $ex) {
+            Log::error($e->getMessage());
             throw new \Exception('An error occured: '.$ex->getMessage());
         }
+
+	Log::debug("count mail_ids: ".count($mail_ids));
 
 	    $numberToGet = 0;
         if (count($mail_ids) > 0) {
             foreach ($mail_ids as $mail_id) {
-                
+        	Log::debug("fetchEmail id: ".$mail_id);        
                 if($mail = $this->fetchEmail($this->mailbox, $mail_id)) {  
-                    
+                    Log::debug("fetch succeeded");
+
                     $returnPath = "";
                     if (isset($mail->headers()["Return-Path"])) {
                         $returnPath = $mail->headers()["Return-Path"];
@@ -349,7 +357,7 @@ class Download
                     $sentTo = "";
                     if (isset($mail->headers()["Envelope-to"])) {
                         $sentTo = $mail->headers()["Envelope-to"];
-		            } else if (isset($mail->headers()["To"])) {
+		    } else if (isset($mail->headers()["To"])) {
                         $sentTo = $mail->headers()["To"];
                     } else if (isset($mail->headers()["Delivered-To"])) {
                         $sentTo = $mail->headers()["Delivered-To"];
@@ -357,10 +365,15 @@ class Download
 
                     $sentTo = $this->parseEmailAddress($sentTo);
 
-		            //if ($sentTo != $this->username) {
+		    //if ($sentTo != $this->username) {
                     if ($sentTo == "john@pricedrop.co.za") {
                         continue;
                     }
+
+		    // REMOVE
+		    if ($sentTo == "info@babyandtoddler.co.za") {
+			    $sentTo = "support@babyandtoddler.co.za";
+		    }
 
                     $mailArray = [
                         "sentTo"        => $sentTo,
@@ -370,7 +383,7 @@ class Download
                         "ip"            => $mail->ips()[0]??"",
                         "fromAddress"   => $mail->fromAddress(),
                         "fromName"      => $mail->fromName(),
-			            "message"       => $mail->message(),
+			"message"       => $mail->message(),
                         "attachments"   => $mail->attachments()
                     ];
 
@@ -390,18 +403,22 @@ class Download
                         $processMail = false; 
                     }
 
-	                if ($processMail) {
+		    if ($processMail) {
+			    Log::debug("queuein mail: ".print_r($mailArray, true));
+			    Log::debug(print_r($this->callbackJob, true));
                         $this->callbackJob::dispatch($mailArray)
                             ->delay(now()
                             ->addSeconds(15));
                     }
 
-		            if ($numberToGet++ >= config("tickets.download_per_round")) {
+		    if ($numberToGet++ >= config("tickets.download_per_round")) {
                         break;
                     }
-                }
+		} else {
+			Log::debug("Fetch failed for ".$mail_id);
+		}
 
-                if (config("tickets.delete_after_download") == true) {
+		if ($this->deleteAfterFetch) {
                     $this->mailbox->deleteMail($mail_id);
                 }
                 
