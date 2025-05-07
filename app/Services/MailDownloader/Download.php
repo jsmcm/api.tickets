@@ -24,11 +24,7 @@ class Download
         private $callbackJob,
         private string $host,
         private int $port=143,
-<<<<<<< HEAD
-	private string $protocol="imap",
-	private bool $deleteAfterFetch=true
-=======
->>>>>>> 95d8f5477010df76e157e6817e077d400676ff5c
+        private bool $deleteAfterFetch=true
         )
     {
 
@@ -46,18 +42,7 @@ class Download
         if ($port == 143 || $port == 993) {
             $protocol = "imap";
         }
-	
-<<<<<<< HEAD
-     	Log::debug("getting dept emails - ".$username);	
-=======
-        // Log::debug("host: ".$host);
-        // Log::debug("port: ".$port);
-        // Log::debug("protocol: ".$protocol);
-        // Log::debug("connectionType: ".$connectionType);
-        // Log::debug("username: ".$username);
-        // Log::debug("password: ".$password);
 
->>>>>>> 95d8f5477010df76e157e6817e077d400676ff5c
         $this->mailbox = new Mailbox(
             '{'.$host.':'.$port.'/'.$protocol.'/'.$connectionType.'}INBOX', // IMAP server and mailbox folder
             $username, // Username for the before configured mailbox
@@ -345,14 +330,12 @@ class Download
 
 		$mail_ids = $this->mailbox->searchMailbox($seen);
 	} catch (ConnectionException $ex) {
-            Log::error($e->getMessage());
+            Log::error($ex->getMessage());
             throw new \Exception('IMAP connection failed: '.$ex->getMessage());
         } catch (\Exception $ex) {
-            Log::error($e->getMessage());
+            Log::error($ex->getMessage());
             throw new \Exception('An error occured: '.$ex->getMessage());
         }
-
-	Log::debug("count mail_ids: ".count($mail_ids));
 
 	    $numberToGet = 0;
         if (count($mail_ids) > 0) {
@@ -379,15 +362,15 @@ class Download
 
                     $sentTo = $this->parseEmailAddress($sentTo);
 
-		    //if ($sentTo != $this->username) {
+		             //if ($sentTo != $this->username) {
                     if ($sentTo == "john@pricedrop.co.za") {
                         continue;
                     }
 
-		    // REMOVE
-		    if ($sentTo == "info@babyandtoddler.co.za") {
-			    $sentTo = "support@babyandtoddler.co.za";
-		    }
+                    // REMOVE
+                    if ($sentTo == "info@babyandtoddler.co.za") {
+                        $sentTo = "support@babyandtoddler.co.za";
+                    }
 
                     $mailArray = [
                         "sentTo"        => $sentTo,
@@ -397,7 +380,7 @@ class Download
                         "ip"            => $mail->ips()[0]??"",
                         "fromAddress"   => $mail->fromAddress(),
                         "fromName"      => $mail->fromName(),
-			"message"       => $mail->message(),
+			            "message"       => $mail->message(),
                         "attachments"   => $mail->attachments()
                     ];
 
