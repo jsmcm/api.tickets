@@ -34,3 +34,10 @@ Route::get('/', function () {
     return "<a href='https://softsmart.co.za'>SoftSmart.co.za</a>";
 });
 
+Route::get("/pragma", function() {
+
+        $mode = \DB::select("PRAGMA journal_mode");
+        $cache = \DB::select("PRAGMA cache_size");
+        $sync = \DB::select("PRAGMA synchronous");
+        return [$mode, $cache, $sync];
+});
